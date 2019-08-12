@@ -1,5 +1,6 @@
 package com.ufcg.br.listapramim.resource;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,21 @@ public class ProdutoResource {
 	@GetMapping("/{id}")
 	public ResponseEntity<Produto> getProduto(@PathVariable long id) {
 		return this.produtoService.getProduto(id);
+	}
+	
+	@GetMapping("/ordered")
+	public ResponseEntity<ArrayList<Produto>> getProdutosOrdenados(){
+		return this.produtoService.getProdutosOrdenados();
+	}
+	
+	@GetMapping("/ordered/{categoria}")
+	public ResponseEntity<ArrayList<Produto>> getProdutosOrdenadosCategoria(@PathVariable String categoria){
+		return this.produtoService.getProdutosOrdenadosCategoria(categoria);
+	}
+	
+	@GetMapping("/ordered/{preco}")
+	public ResponseEntity<ArrayList<Produto>> getProdutosOrdenadosPreco(){
+		return this.produtoService.getProdutosOrdenadosPreco();
 	}
 	
 	@PostMapping
