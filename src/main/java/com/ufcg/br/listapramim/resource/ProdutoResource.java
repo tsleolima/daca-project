@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ufcg.br.listapramim.model.Produto;
+import com.ufcg.br.listapramim.model.ProdutoDAO;
 import com.ufcg.br.listapramim.service.ProdutoService;
 
 @RestController
@@ -28,22 +29,22 @@ public class ProdutoResource {
 		return this.produtoService.getProdutos();
 	}
 	
-	@GetMapping(path= {"id"})
+	@GetMapping("/{id}")
 	public ResponseEntity<Produto> getProduto(@PathVariable long id) {
 		return this.produtoService.getProduto(id);
 	}
 	
 	@PostMapping
-	public Produto cadastrarProduto(@RequestBody Produto produto) {
+	public Produto cadastrarProduto(@RequestBody ProdutoDAO produto) {
 		return this.produtoService.cadastrarProduto(produto);
 	}
 
-	@PutMapping(value = {"id"})
-	public ResponseEntity<Produto> atualizarProduto (@PathVariable long id, Produto produto) {
+	@PutMapping("/{id}")
+	public ResponseEntity<Produto> atualizarProduto (@PathVariable long id, @RequestBody Produto produto) {
 		return this.produtoService.atualizarProduto(id,produto);
 	}
 	
-	@DeleteMapping(path = {"id"})
+	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deletarProduto (@PathVariable long id) {
 		return this.produtoService.deletarProduto(id);
 	}

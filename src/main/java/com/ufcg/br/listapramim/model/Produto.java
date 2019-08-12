@@ -8,21 +8,35 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection="produto")
 public class Produto {
 
+	private static final String VALORPADRAO = "1";
+
 	@Id
 	private long id;
 	
 	private String nome;
 	private Categoria categoria;
+	private Tipo tipo;
 	private ArrayList<String> mapaDePrecos;
+	private String quantidade;
 	
 	public Produto () {}
 	
-	public Produto (String nome, String categoria) {
+	public Produto (String nome, String categoria,String tipo) {
 		this.nome = nome;
 		this.categoria = Categoria.valueOf(categoria);
+		this.tipo = Tipo.valueOf(tipo);
 		this.mapaDePrecos = new ArrayList<String>();
+		this.quantidade = VALORPADRAO;
 	}
 
+	public Produto (String nome, String categoria,String tipo, String quantidade) {
+		this.nome = nome;
+		this.categoria = Categoria.valueOf(categoria);
+		this.tipo = Tipo.valueOf(tipo);
+		this.mapaDePrecos = new ArrayList<String>();
+		this.quantidade = quantidade;
+	}
+	
 	public long getId() {
 		return id;
 	}
@@ -55,6 +69,22 @@ public class Produto {
 		this.mapaDePrecos = mapaDePrecos;
 	}
 	
+	public String getQuantidade() {
+		return quantidade;
+	}
+
+	public void setQuantidade(String quantidade) {
+		this.quantidade = quantidade;
+	}
+	
+	public Tipo getTipo() {
+		return tipo;
+	}
+
+	public void setTipo(Tipo tipo) {
+		this.tipo = tipo;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

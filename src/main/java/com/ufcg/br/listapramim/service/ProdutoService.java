@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import com.ufcg.br.listapramim.repository.ProdutoRepository;
 import com.ufcg.br.listapramim.model.Produto;
+import com.ufcg.br.listapramim.model.ProdutoDAO;
+
 @Service
 public class ProdutoService {
 
@@ -20,8 +22,10 @@ public class ProdutoService {
 		return this.produtoRepository.findAll();
 	}
 
-	public Produto cadastrarProduto(Produto produto) {
-		Produto updated = produto;
+	public Produto cadastrarProduto(ProdutoDAO produto) {
+		Produto updated;
+		if (produto.getQuantidade() != null) updated = new Produto(produto.getNome(),produto.getCategoria(),produto.getTipo(),produto.getQuantidade());
+		else updated = new Produto(produto.getNome(),produto.getCategoria(),produto.getTipo());
 		updated.setId(nextSequenceService.getNextSequence("customSequences"));
 		return this.produtoRepository.save(updated);
 	}
@@ -37,6 +41,8 @@ public class ProdutoService {
 				.map(produtoBuscado -> {
 					produtoBuscado.setNome(produto.getNome());
 					produtoBuscado.setCategoria(produto.getCategoria());
+					produtoBuscado.setQuantidade(produto.getQuantidade());
+					produtoBuscado.setTipo(produto.getTipo());
 					produtoBuscado.setMapaDePrecos(produto.getMapaDePrecos());
 					Produto updated = produtoRepository.save(produtoBuscado);
 					return ResponseEntity.ok().body(updated);
