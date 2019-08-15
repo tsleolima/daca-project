@@ -2,6 +2,8 @@ package com.ufcg.br.listapramim.model;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -97,6 +99,12 @@ public class ListaDeCompra {
 		} else if (!descritor.equals(other.descritor))
 			return false;
 		return true;
+	}
+
+	public boolean isValida() {
+		Set<Compra> set = new HashSet<Compra>(this.compras);
+		if(set.size() != this.compras.size()) return false;
+		else return true;
 	}
 	
 }

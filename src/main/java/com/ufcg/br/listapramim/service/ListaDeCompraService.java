@@ -25,14 +25,21 @@ public class ListaDeCompraService {
 	}
 
 	public ResponseEntity<ListaDeCompra> atualizarLista(ObjectId id, ListaDeCompra lista) {
-		ListaDeCompra listaBuscada =  this.listaDeCompraRepository.findListaBy_id(id);
+		ListaDeCompra listaBuscada = this.listaDeCompraRepository.findListaBy_id(id);
 		if(listaBuscada != null) {
 			listaBuscada.setCompras(lista.getCompras());
-			listaBuscada.setDescritor(lista.getDescritor());
 			ListaDeCompra listaatt = this.listaDeCompraRepository.save(lista);
 			return ResponseEntity.ok().body(listaatt);
 		} else return ResponseEntity.notFound().build();
 		
+	}
+
+	public ResponseEntity<ListaDeCompra> removerLista(ObjectId id) {
+		ListaDeCompra lista = this.listaDeCompraRepository.findListaBy_id(id);
+		if(lista != null) {
+			 this.listaDeCompraRepository.delete(lista);
+			 return ResponseEntity.ok().build();
+		} else return ResponseEntity.notFound().build();
 	}
 
 }
