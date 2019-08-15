@@ -1,6 +1,8 @@
-package com.ufcg.br.listapramim.model;
+package com.ufcg.br.listapramim.util;
 
 import java.util.Comparator;
+
+import com.ufcg.br.listapramim.model.Produto;
 
 public class ProdutoNomeComparator implements Comparator<Produto>{
 

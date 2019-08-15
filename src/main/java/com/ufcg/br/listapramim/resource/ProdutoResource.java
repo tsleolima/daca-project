@@ -3,6 +3,7 @@ package com.ufcg.br.listapramim.resource;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ufcg.br.listapramim.model.ItemVenda;
 import com.ufcg.br.listapramim.model.Produto;
 import com.ufcg.br.listapramim.model.ProdutoDAO;
 import com.ufcg.br.listapramim.service.ProdutoService;
@@ -31,7 +33,7 @@ public class ProdutoResource {
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<Produto> getProduto(@PathVariable long id) {
+	public ResponseEntity<Produto> getProduto(@PathVariable ObjectId id) {
 		return this.produtoService.getProduto(id);
 	}
 	
@@ -45,9 +47,14 @@ public class ProdutoResource {
 		return this.produtoService.getProdutosOrdenadosCategoria(categoria);
 	}
 	
-	@GetMapping("/ordered/{preco}")
-	public ResponseEntity<ArrayList<Produto>> getProdutosOrdenadosPreco(){
+	@GetMapping("/ordered/preco")
+	public List<ItemVenda> getProdutosOrdenadosPreco(){
 		return this.produtoService.getProdutosOrdenadosPreco();
+	}
+	
+	@GetMapping("/search/{nome}")
+	public ResponseEntity<ArrayList<Produto>> pesquisaProdutoNome(@PathVariable String nome){
+		return this.produtoService.pesquisaProdutoNome(nome);
 	}
 	
 	@PostMapping
@@ -56,12 +63,12 @@ public class ProdutoResource {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<Produto> atualizarProduto (@PathVariable long id, @RequestBody Produto produto) {
+	public ResponseEntity<Produto> atualizarProduto (@PathVariable ObjectId id, @RequestBody Produto produto) {
 		return this.produtoService.atualizarProduto(id,produto);
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<?> deletarProduto (@PathVariable long id) {
+	public ResponseEntity<?> deletarProduto (@PathVariable ObjectId id) {
 		return this.produtoService.deletarProduto(id);
 	}
 }

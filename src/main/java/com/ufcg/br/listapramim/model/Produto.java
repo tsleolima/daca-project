@@ -2,8 +2,12 @@ package com.ufcg.br.listapramim.model;
 
 import java.util.ArrayList;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import com.ufcg.br.listapramim.model.enums.Categoria;
+import com.ufcg.br.listapramim.model.enums.Tipo;
 
 @Document(collection="produto")
 public class Produto {
@@ -11,12 +15,12 @@ public class Produto {
 	private static final String VALORPADRAO = "1";
 
 	@Id
-	private long id;
+	public ObjectId _id;
 	
 	private String nome;
 	private Categoria categoria;
 	private Tipo tipo;
-	private ArrayList<String> mapaDePrecos;
+	private ArrayList<ItemVenda> mapaDePrecos;
 	private String quantidade;
 	
 	public Produto () {}
@@ -25,7 +29,7 @@ public class Produto {
 		this.nome = nome;
 		this.categoria = Categoria.valueOf(categoria);
 		this.tipo = Tipo.valueOf(tipo);
-		this.mapaDePrecos = new ArrayList<String>();
+		this.mapaDePrecos = new ArrayList<ItemVenda>();
 		this.quantidade = VALORPADRAO;
 	}
 
@@ -33,16 +37,16 @@ public class Produto {
 		this.nome = nome;
 		this.categoria = Categoria.valueOf(categoria);
 		this.tipo = Tipo.valueOf(tipo);
-		this.mapaDePrecos = new ArrayList<String>();
+		this.mapaDePrecos = new ArrayList<ItemVenda>();
 		this.quantidade = quantidade;
 	}
 	
-	public long getId() {
-		return id;
+	public ObjectId getId() {
+		return _id;
 	}
 
-	public void setId(long id) {
-		this.id = id;
+	public void setId(ObjectId id) {
+		this._id = id;
 	}
 
 	public String getNome() {
@@ -61,11 +65,11 @@ public class Produto {
 		this.categoria = categoria;
 	}
 
-	public ArrayList<String> getMapaDePrecos() {
+	public ArrayList<ItemVenda> getMapaDePrecos() {
 		return mapaDePrecos;
 	}
 
-	public void setMapaDePrecos(ArrayList<String> mapaDePrecos) {
+	public void setMapaDePrecos(ArrayList<ItemVenda> mapaDePrecos) {
 		this.mapaDePrecos = mapaDePrecos;
 	}
 	
@@ -89,8 +93,9 @@ public class Produto {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (int) (id ^ (id >>> 32));
+		result = prime * result + ((categoria == null) ? 0 : categoria.hashCode());
 		result = prime * result + ((nome == null) ? 0 : nome.hashCode());
+		result = prime * result + ((tipo == null) ? 0 : tipo.hashCode());
 		return result;
 	}
 
@@ -103,14 +108,16 @@ public class Produto {
 		if (getClass() != obj.getClass())
 			return false;
 		Produto other = (Produto) obj;
-		if (id != other.id)
+		if (categoria != other.categoria)
 			return false;
 		if (nome == null) {
 			if (other.nome != null)
 				return false;
 		} else if (!nome.equals(other.nome))
 			return false;
+		if (tipo != other.tipo)
+			return false;
 		return true;
 	}
-	
+
 }
