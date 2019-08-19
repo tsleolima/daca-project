@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ufcg.br.listapramim.model.ItemVenda;
 import com.ufcg.br.listapramim.model.Produto;
-import com.ufcg.br.listapramim.model.ProdutoDAO;
 import com.ufcg.br.listapramim.service.ProdutoService;
 
 @RestController
@@ -58,7 +57,7 @@ public class ProdutoResource {
 	}
 	
 	@PostMapping
-	public Produto cadastrarProduto(@RequestBody ProdutoDAO produto) {
+	public ResponseEntity<Produto> cadastrarProduto(@RequestBody Produto produto) {
 		return this.produtoService.cadastrarProduto(produto);
 	}
 

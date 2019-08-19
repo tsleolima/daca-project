@@ -23,8 +23,6 @@ public class Produto {
 	private ArrayList<ItemVenda> mapaDePrecos;
 	private String quantidade;
 	
-	public Produto () {}
-	
 	public Produto (String nome, String categoria,String tipo) {
 		this.nome = nome;
 		this.categoria = Categoria.valueOf(categoria);
@@ -40,6 +38,8 @@ public class Produto {
 		this.mapaDePrecos = new ArrayList<ItemVenda>();
 		this.quantidade = quantidade;
 	}
+	
+	public Produto () {}
 	
 	public ObjectId getId() {
 		return _id;

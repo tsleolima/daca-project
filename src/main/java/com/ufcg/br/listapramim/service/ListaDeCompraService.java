@@ -25,8 +25,27 @@ public class ListaDeCompraService {
 		return this.listaDeCompraRepository.findAll();
 	}
 
-	public ListaDeCompra cadastrarProduto(ListaDeCompra lista) {
-		return this.listaDeCompraRepository.save(lista);
+	public ResponseEntity<ListaDeCompra> cadastrarProduto(ListaDeCompra lista) {
+		if(existsLista(lista) && existsListaDescritor(lista.getDescritor()) != null) {
+			return ResponseEntity.badRequest().build();
+		}
+		return ResponseEntity.ok().body(this.listaDeCompraRepository.save(lista));
+	}
+
+	private ListaDeCompra existsListaDescritor(String descritor) {
+		ArrayList<ListaDeCompra> listas = (ArrayList<ListaDeCompra>) this.listaDeCompraRepository.findAll();
+		for (ListaDeCompra listaDeCompra : listas) {
+			if(listaDeCompra.getDescritor().equals(descritor)) {
+				return listaDeCompra;
+			}
+		}
+		return null;
+	}
+
+	private boolean existsLista(ListaDeCompra lista) {
+		ListaDeCompra listaBuscada = this.listaDeCompraRepository.findListaBy_id(lista.get_id());
+		if(listaBuscada == null) return true;
+		return false;
 	}
 
 	public ResponseEntity<ListaDeCompra> atualizarLista(ObjectId id, ListaDeCompra lista) {
@@ -36,8 +55,7 @@ public class ListaDeCompraService {
 			listaBuscada.setDescritor(lista.getDescritor());
 			listaBuscada.setLocalCompra(lista.getLocalCompra());
 			listaBuscada.setValorFinal(lista.getValorFinal());
-			this.listaDeCompraRepository.delete(listaBuscada);
-			ListaDeCompra listaatt = this.listaDeCompraRepository.save(lista);
+			ListaDeCompra listaatt = this.listaDeCompraRepository.save(listaBuscada);
 			return ResponseEntity.ok().body(listaatt);
 		} else return ResponseEntity.notFound().build();
 		
@@ -77,5 +95,23 @@ public class ListaDeCompraService {
 	
 	public ArrayList<Compra> produtosHigienePessoal(ArrayList<Compra> compras) {
 		return this.produtoService.produtosHigienePessoal(compras);
+	}
+
+	public ResponseEntity<ListaDeCompra> buscarListaDescritor(String descritor) {
+		ListaDeCompra listaBuscada = this.existsListaDescritor(descritor);
+		if(listaBuscada != null) {
+			return ResponseEntity.ok().body(listaBuscada);
+		}
+		return ResponseEntity.notFound().build();
+	}
+
+	public ResponseEntity<ListaDeCompra> buscarListaProduto(ObjectId idProduto) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public ResponseEntity<ListaDeCompra> buscarListaData(ObjectId data) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

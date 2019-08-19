@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import com.ufcg.br.listapramim.model.Compra;
 import com.ufcg.br.listapramim.model.ItemVenda;
 import com.ufcg.br.listapramim.model.Produto;
-import com.ufcg.br.listapramim.model.ProdutoDAO;
 import com.ufcg.br.listapramim.model.enums.Categoria;
 import com.ufcg.br.listapramim.repository.ProdutoRepository;
 import com.ufcg.br.listapramim.util.CompraNomeComparator;
@@ -66,11 +65,21 @@ public class ProdutoService {
 		return itensAvenda;
 	}
 	
-	public Produto cadastrarProduto(ProdutoDAO produto) {
+	public ResponseEntity<Produto> cadastrarProduto(Produto produto) {
 		Produto updated;
-		if (produto.getQuantidade() != null) updated = new Produto(produto.getNome(),produto.getCategoria(),produto.getTipo(),produto.getQuantidade());
-		else updated = new Produto(produto.getNome(),produto.getCategoria(),produto.getTipo());
-		return this.produtoRepository.save(updated);
+		if (produto.getQuantidade() != null) updated = new Produto(produto.getNome(),produto.getCategoria().toString(),produto.getTipo().toString(),produto.getQuantidade());
+		else updated = new Produto(produto.getNome(),produto.getCategoria().toString(),produto.getTipo().toString());
+		
+		if(existsProduto(produto)) {
+			return ResponseEntity.badRequest().build();
+		}
+		return ResponseEntity.ok().body(this.produtoRepository.save(updated));
+	}
+	
+	private boolean existsProduto(Produto produto) {
+		Produto produtoBuscado = this.produtoRepository.findProdutoBy_id(produto.getId());
+		if(produtoBuscado == null) return true;
+		return false;
 	}
 
 	public ResponseEntity<Produto> atualizarProduto(ObjectId id, Produto produto) {
