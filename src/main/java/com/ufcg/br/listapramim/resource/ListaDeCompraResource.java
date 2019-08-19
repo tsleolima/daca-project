@@ -29,18 +29,23 @@ public class ListaDeCompraResource {
 		return listaDeCompraService.getListas();
 	}
 	
+	@GetMapping("/ordered/{id}")
+	public ResponseEntity<ListaDeCompra> getListaCompra(@PathVariable ObjectId id){
+		return this.listaDeCompraService.getListaCompra(id);
+	}
+	
 	@PostMapping
 	public ListaDeCompra cadastrarProduto (@RequestBody ListaDeCompra lista) {
 		return this.listaDeCompraService.cadastrarProduto(lista);
 	}
 	
 	/* adicionar validacao para descritor repetido e duplicatas em compras */
-	@PutMapping({"/id"})
+	@PutMapping("/{id}")
 	public ResponseEntity<ListaDeCompra> atualizarLista(@PathVariable ObjectId id, @RequestBody ListaDeCompra lista){
 		return this.listaDeCompraService.atualizarLista(id,lista);
 	}
 	
-	@DeleteMapping({"/id"})
+	@DeleteMapping("/{id}")
 	public ResponseEntity<ListaDeCompra> removerLista(@PathVariable ObjectId id) {
 		return this.listaDeCompraService.removerLista(id);
 	}

@@ -10,11 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.ufcg.br.listapramim.model.Compra;
 import com.ufcg.br.listapramim.model.ItemVenda;
 import com.ufcg.br.listapramim.model.Produto;
 import com.ufcg.br.listapramim.model.ProdutoDAO;
 import com.ufcg.br.listapramim.model.enums.Categoria;
 import com.ufcg.br.listapramim.repository.ProdutoRepository;
+import com.ufcg.br.listapramim.util.CompraNomeComparator;
 import com.ufcg.br.listapramim.util.ItemVendaPrecoComparator;
 import com.ufcg.br.listapramim.util.ProdutoNomeComparator;
 
@@ -109,4 +111,41 @@ public class ProdutoService {
 		
 		return ResponseEntity.ok().body(saida);
 	}
+
+	public ArrayList<Compra> produtosIndustrializados(ArrayList<Compra> compras) {
+		ArrayList<Compra> comprasCategoriaSelecionada = (ArrayList<Compra>) compras.stream()
+				.filter(compra -> this.produtoRepository.findProdutoBy_id(compra.getIdProduto()).getCategoria().equals(Categoria.valueOf("ALIMENTOSINDUSTRIALIZADOS")))
+				.collect(Collectors.toList());
+		
+		Collections.sort(comprasCategoriaSelecionada, new CompraNomeComparator());
+		return comprasCategoriaSelecionada;
+	}
+
+	public ArrayList<Compra> produtosNaoIndustrializados(ArrayList<Compra> compras) {
+		ArrayList<Compra> comprasCategoriaSelecionada = (ArrayList<Compra>) compras.stream()
+				.filter(compra -> this.produtoRepository.findProdutoBy_id(compra.getIdProduto()).getCategoria().equals(Categoria.valueOf("ALIMENTOSNAOINDUSTRIALIZADOS")))
+				.collect(Collectors.toList());	
+		
+		Collections.sort(comprasCategoriaSelecionada, new CompraNomeComparator());
+		return comprasCategoriaSelecionada;
+	}
+
+	public ArrayList<Compra> produtosLimpeza(ArrayList<Compra> compras) {
+		ArrayList<Compra> comprasCategoriaSelecionada = (ArrayList<Compra>) compras.stream()
+				.filter(compra -> this.produtoRepository.findProdutoBy_id(compra.getIdProduto()).getCategoria().equals(Categoria.valueOf("LIMPEZA")))
+				.collect(Collectors.toList());
+		
+		Collections.sort(comprasCategoriaSelecionada, new CompraNomeComparator());
+		return comprasCategoriaSelecionada;
+	}
+
+	public ArrayList<Compra> produtosHigienePessoal(ArrayList<Compra> compras) {
+		ArrayList<Compra> comprasCategoriaSelecionada = (ArrayList<Compra>) compras.stream()
+				.filter(compra -> this.produtoRepository.findProdutoBy_id(compra.getIdProduto()).getCategoria().equals(Categoria.valueOf("HIGIENEPESSOAL")))
+				.collect(Collectors.toList());
+		
+		Collections.sort(comprasCategoriaSelecionada, new CompraNomeComparator());
+		return comprasCategoriaSelecionada;
+	}
+	
 }

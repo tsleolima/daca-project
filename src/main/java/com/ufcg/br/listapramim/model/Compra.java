@@ -1,13 +1,16 @@
 package com.ufcg.br.listapramim.model;
 
+import org.bson.types.ObjectId;
+
 public class Compra {
 	
 	private int quantidade;
-	private Produto produto;
+	private String nomeProduto;
+	private ObjectId idProduto;
 	
-	public Compra(int quantidade, Produto produto) {
+	public Compra(int quantidade, ObjectId idProduto) {
 		this.quantidade = quantidade;
-		this.produto = produto;
+		this.idProduto = idProduto;
 	}
 
 	public int getQuantidade() {
@@ -17,20 +20,28 @@ public class Compra {
 	public void setQuantidade(int quantidade) {
 		this.quantidade = quantidade;
 	}
-	
-	public Produto getProduto() {
-		return produto;
+
+	public ObjectId getIdProduto() {
+		return idProduto;
+	}
+
+	public void setIdProduto(ObjectId idProduto) {
+		this.idProduto = idProduto;
 	}
 	
-	public void setProduto(Produto produto) {
-		this.produto = produto;
+	public String getNomeProduto() {
+		return nomeProduto;
+	}
+
+	public void setNomeProduto(String nomeProduto) {
+		this.nomeProduto = nomeProduto;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((produto == null) ? 0 : produto.hashCode());
+		result = prime * result + ((idProduto == null) ? 0 : idProduto.hashCode());
 		result = prime * result + quantidade;
 		return result;
 	}
@@ -44,14 +55,14 @@ public class Compra {
 		if (getClass() != obj.getClass())
 			return false;
 		Compra other = (Compra) obj;
-		if (produto == null) {
-			if (other.produto != null)
+		if (idProduto == null) {
+			if (other.idProduto != null)
 				return false;
-		} else if (!produto.equals(other.produto))
+		} else if (!idProduto.equals(other.idProduto))
 			return false;
 		if (quantidade != other.quantidade)
 			return false;
 		return true;
 	}
-	
+
 }

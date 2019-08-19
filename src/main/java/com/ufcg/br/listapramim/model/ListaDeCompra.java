@@ -1,7 +1,6 @@
 package com.ufcg.br.listapramim.model;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -13,13 +12,12 @@ public class ListaDeCompra {
 	@Id
 	private ObjectId _id;
 	private String descritor;
-	private Date dataCompra;
-	
+	private double valorFinal;
+	private String localCompra;
 	private ArrayList<Compra> compras;
 	
 	public ListaDeCompra(String descritor) {
 		this.descritor = descritor;
-		this.dataCompra = new Date();
 		this.compras = new ArrayList<Compra>();
 	}
 	
@@ -41,14 +39,6 @@ public class ListaDeCompra {
 	public void setDescritor(String descritor) {
 		this.descritor = descritor;
 	}
-	
-	public Date getDataCompra() {
-		return dataCompra;
-	}
-
-	public void setDataCompra(Date dataCompra) {
-		this.dataCompra = dataCompra;
-	}
 
 	public ArrayList<Compra> getCompras() {
 		return compras;
@@ -57,6 +47,23 @@ public class ListaDeCompra {
 	public void setCompras(ArrayList<Compra> compras) {
 		this.compras = compras;
 	}
+	
+	public double getValorFinal() {
+		return valorFinal;
+	}
+
+	public void setValorFinal(double valorFinal) {
+		this.valorFinal = valorFinal;
+	}
+
+	public String getLocalCompra() {
+		return localCompra;
+	}
+
+	public void setLocalCompra(String localCompra) {
+		this.localCompra = localCompra;
+	}
+
 
 	@Override
 	public int hashCode() {
@@ -64,7 +71,6 @@ public class ListaDeCompra {
 		int result = 1;
 		result = prime * result + ((_id == null) ? 0 : _id.hashCode());
 		result = prime * result + ((compras == null) ? 0 : compras.hashCode());
-		result = prime * result + ((dataCompra == null) ? 0 : dataCompra.hashCode());
 		result = prime * result + ((descritor == null) ? 0 : descritor.hashCode());
 		return result;
 	}
@@ -88,11 +94,6 @@ public class ListaDeCompra {
 				return false;
 		} else if (!compras.equals(other.compras))
 			return false;
-		if (dataCompra == null) {
-			if (other.dataCompra != null)
-				return false;
-		} else if (!dataCompra.equals(other.dataCompra))
-			return false;
 		if (descritor == null) {
 			if (other.descritor != null)
 				return false;
@@ -101,7 +102,7 @@ public class ListaDeCompra {
 		return true;
 	}
 
-	public boolean isValida() {
+	public boolean validaProdutosNaLista() {
 		Set<Compra> set = new HashSet<Compra>(this.compras);
 		if(set.size() != this.compras.size()) return false;
 		else return true;
