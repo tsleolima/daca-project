@@ -1,5 +1,6 @@
 package com.ufcg.br.listapramim.resource;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bson.types.ObjectId;
@@ -56,7 +57,7 @@ public class ListaDeCompraResource {
 	}
 	
 	@GetMapping("/search/data/{data}")
-	public ResponseEntity<ListaDeCompra> buscarListaData(@PathVariable ObjectId data){
+	public ResponseEntity<ArrayList<ListaDeCompra>> buscarListaData(@PathVariable ObjectId data){
 		return this.listaDeCompraService.buscarListaData(data);
 	}
 	

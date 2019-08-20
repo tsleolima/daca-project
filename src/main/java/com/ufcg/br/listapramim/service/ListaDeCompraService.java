@@ -1,5 +1,6 @@
 package com.ufcg.br.listapramim.service;
 
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.format.DataFormatDetector;
 import com.ufcg.br.listapramim.model.Compra;
 import com.ufcg.br.listapramim.model.ListaDeCompra;
 import com.ufcg.br.listapramim.repository.ListaDeCompraRepository;
@@ -110,14 +112,25 @@ public class ListaDeCompraService {
 		return null;
 	}
 
-	public ResponseEntity<ListaDeCompra> buscarListaData(ObjectId data) {
-		ArrayList<ListaDeCompra> compras = (ArrayList<ListaDeCompra>) this.listaDeCompraRepository.findAll();
-		for (ListaDeCompra compra : compras) {
-			String[] split = compra.get_id().getDate().toString().split(" ");
-			System.out.println(split[0]);
+	public ResponseEntity<ArrayList<ListaDeCompra>> buscarListaData(ObjectId data) {
+		ArrayList<ListaDeCompra> listas = (ArrayList<ListaDeCompra>) this.listaDeCompraRepository.findAll();
+		ArrayList<ListaDeCompra> listasBuscadas = new ArrayList<ListaDeCompra>();
+		for (ListaDeCompra lista : listas) {
+			String[] splitDataCompra = lista.get_id().getDate().toString().split(" ");
+			String[] splitDataPesquisada = lista.get_id().getDate().toString().split(" ");
+			String dataFormatadaCompra = splitDataCompra[2] + " " + splitDataCompra[1] + " " + splitDataCompra[5];
+			String dataFormatadaPesquisada = splitDataPesquisada[2] + " " + splitDataPesquisada[1] + " " + splitDataPesquisada[5];
+			System.out.println(getMonthNumber(splitDataCompra[1]));
+			if(dataFormatadaCompra.equals(dataFormatadaPesquisada)) {
+				listasBuscadas.add(lista);
+			}
 			
 		}
 		
-		return ResponseEntity.ok().build();
+		return ResponseEntity.ok().body(listas);
+	}
+	
+	private int getMonthNumber(String monthName) {
+	    return Month.valueOf(monthName.toUpperCase()).getValue();
 	}
 }
