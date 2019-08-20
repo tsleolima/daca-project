@@ -50,17 +50,17 @@ public class ListaDeCompraResource {
 		return this.listaDeCompraService.removerLista(id);
 	}
 	
-	@GetMapping("/search/{descritor}")
+	@GetMapping("/search/descritor/{descritor}")
 	public ResponseEntity<ListaDeCompra> buscarListaDescritor(@PathVariable String descritor){
 		return this.listaDeCompraService.buscarListaDescritor(descritor);
 	}
 	
-	@GetMapping("/search/{data}")
+	@GetMapping("/search/data/{data}")
 	public ResponseEntity<ListaDeCompra> buscarListaData(@PathVariable ObjectId data){
 		return this.listaDeCompraService.buscarListaData(data);
 	}
 	
-	@GetMapping("/search/{idProduto}")
+	@GetMapping("/search/idproduto/{idProduto}")
 	public ResponseEntity<ListaDeCompra> buscarListaProduto(@PathVariable ObjectId idProduto){
 		return this.listaDeCompraService.buscarListaProduto(idProduto);
 	}

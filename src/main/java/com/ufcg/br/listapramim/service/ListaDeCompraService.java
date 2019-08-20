@@ -111,7 +111,13 @@ public class ListaDeCompraService {
 	}
 
 	public ResponseEntity<ListaDeCompra> buscarListaData(ObjectId data) {
-		// TODO Auto-generated method stub
-		return null;
+		ArrayList<ListaDeCompra> compras = (ArrayList<ListaDeCompra>) this.listaDeCompraRepository.findAll();
+		for (ListaDeCompra compra : compras) {
+			String[] split = compra.get_id().getDate().toString().split(" ");
+			System.out.println(split[0]);
+			
+		}
+		
+		return ResponseEntity.ok().build();
 	}
 }
