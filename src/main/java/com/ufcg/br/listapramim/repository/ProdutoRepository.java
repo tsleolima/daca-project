@@ -10,5 +10,7 @@ import com.ufcg.br.listapramim.model.Produto;
 public interface ProdutoRepository extends MongoRepository<Produto,ObjectId>{
 	
 	Produto findProdutoBy_id(ObjectId _id);
+
+	Produto findProdutoByNome(String nome);
 	
 }

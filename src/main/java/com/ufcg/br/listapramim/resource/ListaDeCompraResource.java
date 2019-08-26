@@ -1,9 +1,11 @@
 package com.ufcg.br.listapramim.resource;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,29 +27,65 @@ public class ListaDeCompraResource {
 	private ListaDeCompraService listaDeCompraService;
 	
 	@GetMapping
-	public List<ListaDeCompra> getListas(){
-		return listaDeCompraService.getListas();
+	public ResponseEntity<List<ListaDeCompra>> getListas(){
+		List<ListaDeCompra> listas = listaDeCompraService.getListas();
+		if(listas.size() > 0) {
+			return ResponseEntity.ok().body(listas);
+		} else {
+			return ResponseEntity.noContent().build();
+		}
 	}
 	
-	@GetMapping("/ordered/{id}")
+	@GetMapping("/{id}")
 	public ResponseEntity<ListaDeCompra> getListaCompra(@PathVariable ObjectId id){
-		return this.listaDeCompraService.getListaCompra(id);
+		ListaDeCompra lista = this.listaDeCompraService.getListaCompra(id);
+		if(lista != null) {
+			return ResponseEntity.ok().body(lista);
+		} else {
+			return ResponseEntity.noContent().build();
+		}
 	}
 	
 	@PostMapping
-	public ListaDeCompra cadastrarProduto (@RequestBody ListaDeCompra lista) {
-		return this.listaDeCompraService.cadastrarProduto(lista);
+	public ResponseEntity<ListaDeCompra> cadastrarProduto (@RequestBody ListaDeCompra listaAdd) {
+		ListaDeCompra lista = this.listaDeCompraService.cadastrarProduto(listaAdd);
+		if(lista != null) {
+			return ResponseEntity.ok().body(lista);
+		}
+		return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
 	}
 	
-	/* adicionar validacao para descritor repetido e duplicatas em compras */
 	@PutMapping("/{id}")
-	public ResponseEntity<ListaDeCompra> atualizarLista(@PathVariable ObjectId id, @RequestBody ListaDeCompra lista){
-		return this.listaDeCompraService.atualizarLista(id,lista);
+	public ResponseEntity<ListaDeCompra> atualizarLista(@PathVariable ObjectId id, @RequestBody ListaDeCompra listaAtt){
+		ListaDeCompra lista = this.listaDeCompraService.atualizarLista(id, listaAtt);
+		if(lista != null) {
+			return ResponseEntity.ok().body(lista);
+		}
+		return ResponseEntity.notFound().build();
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<ListaDeCompra> removerLista(@PathVariable ObjectId id) {
-		return this.listaDeCompraService.removerLista(id);
+	public ResponseEntity<?> removerLista(@PathVariable ObjectId id) {
+		ListaDeCompra lista = this.listaDeCompraService.removerLista(id);
+		if(lista != null) {
+			return ResponseEntity.ok().build();
+		}
+		return ResponseEntity.notFound().build();
+	}
+	
+	@GetMapping("/search/descritor/{descritor}")
+	public ResponseEntity<ListaDeCompra> buscarListaDescritor(@PathVariable String descritor){
+		return ResponseEntity.ok().body(this.listaDeCompraService.buscarListaDescritor(descritor));
+	}
+	
+	@GetMapping("/search/data/{data}")
+	public ResponseEntity<ArrayList<ListaDeCompra>> buscarListaData(@PathVariable String data){
+		return ResponseEntity.ok().body(this.listaDeCompraService.buscarListaData(data));
+	}
+	
+	@GetMapping("/search/idproduto/{idProduto}")
+	public ResponseEntity<ListaDeCompra> buscarListaProduto(@PathVariable ObjectId idProduto){
+		return ResponseEntity.ok().body(this.listaDeCompraService.buscarListaProduto(idProduto));
 	}
 	
 }

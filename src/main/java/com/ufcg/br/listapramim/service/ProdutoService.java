@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.ufcg.br.listapramim.model.Compra;
@@ -30,32 +29,28 @@ public class ProdutoService {
 		return this.produtoRepository.findAll();
 	}
 	
-	public ResponseEntity<Produto> getProduto(ObjectId id) {
-		Produto produto = produtoRepository.findProdutoBy_id(id);
-		if (produto != null) return ResponseEntity.ok().body(produto);
-		else return ResponseEntity.notFound().build();
+	public Produto getProduto(ObjectId id) {
+		return this.produtoRepository.findProdutoBy_id(id);
 	}	
 
-	public ResponseEntity<ArrayList<Produto>> getProdutosOrdenados() {
+	public ArrayList<Produto> getProdutosOrdenados() {
 		ArrayList<Produto> produtos = (ArrayList<Produto>) this.produtoRepository.findAll();
 		Collections.sort(produtos, new ProdutoNomeComparator());
-		return ResponseEntity.ok().body(produtos);
+		return produtos;
 	}
 
-	public ResponseEntity<ArrayList<Produto>> getProdutosOrdenadosCategoria(String categoria) {
+	public ArrayList<Produto> getProdutosOrdenadosCategoria(String categoria) {
 		ArrayList<Produto> produtos = (ArrayList<Produto>) this.produtoRepository.findAll();
 		produtos = (ArrayList<Produto>) produtos.stream()
 				.filter( produto -> produto.getCategoria().equals(Categoria.valueOf(categoria)))
 				.collect(Collectors.toList());
 		
 		Collections.sort(produtos, new ProdutoNomeComparator());
-		return ResponseEntity.ok().body(produtos);
+		return produtos;
 	}
 
-	public List<ItemVenda> getProdutosOrdenadosPreco() {
-		System.out.println("cheguei aqui veei primeiro");
+	public ArrayList<ItemVenda> getProdutosOrdenadosPreco() {
 		ArrayList<Produto> produtos = (ArrayList<Produto>) this.produtoRepository.findAll();
-		System.out.println("cheguei aqui veei segundo");
 		ArrayList<ItemVenda> itensAvenda = new ArrayList<ItemVenda>();
 		for (Produto p : produtos) {
 			for (ItemVenda i : p.getMapaDePrecos()) {
@@ -68,12 +63,18 @@ public class ProdutoService {
 	
 	public Produto cadastrarProduto(ProdutoDAO produto) {
 		Produto updated;
-		if (produto.getQuantidade() != null) updated = new Produto(produto.getNome(),produto.getCategoria(),produto.getTipo(),produto.getQuantidade());
-		else updated = new Produto(produto.getNome(),produto.getCategoria(),produto.getTipo());
-		return this.produtoRepository.save(updated);
+		if(this.produtoRepository.findProdutoByNome(produto.getNome()) == null) {
+			
+			if (produto.getQuantidade() != null) updated = new Produto(produto.getNome(),produto.getCategoria(),produto.getTipo(),produto.getQuantidade());
+			else updated = new Produto(produto.getNome(),produto.getCategoria(),produto.getTipo());
+			
+			return this.produtoRepository.save(updated);
+			
+		} 
+		return null;
 	}
 
-	public ResponseEntity<Produto> atualizarProduto(ObjectId id, Produto produto) {
+	public Produto atualizarProduto(ObjectId id, Produto produto) {
 		Produto produtoBuscado = this.produtoRepository.findProdutoBy_id(id);
 		if(produtoBuscado != null) {
 			produtoBuscado.setNome(produto.getNome());
@@ -82,22 +83,19 @@ public class ProdutoService {
 			produtoBuscado.setTipo(produto.getTipo());
 			produtoBuscado.setMapaDePrecos(produto.getMapaDePrecos());
 			Produto updated = produtoRepository.save(produtoBuscado);
-			return ResponseEntity.ok().body(updated);}
+			return updated;}
 		else
-			return ResponseEntity.notFound().build();
+			return produtoBuscado;
 	}
 
-	public ResponseEntity<?> deletarProduto(ObjectId id) {
+	public Produto deletarProduto(ObjectId id) {
 		Produto produto = produtoRepository.findProdutoBy_id(id);
-		if(produto != null) {
-			produtoRepository.delete(produto);
-			return ResponseEntity.ok().build();}
-		else 
-			return ResponseEntity.notFound().build();
+		if(produto != null) produtoRepository.delete(produto);
+		return produto;
 				
 	}
 
-	public ResponseEntity<ArrayList<Produto>> pesquisaProdutoNome(String nome) {
+	public ArrayList<Produto> pesquisaProdutoNome(String nome) {
 		ArrayList<Produto> produtos = (ArrayList<Produto>) this.produtoRepository.findAll();
 		ArrayList<Produto> saida = new ArrayList<Produto>();
 		for (Produto produto : produtos) {
@@ -109,7 +107,7 @@ public class ProdutoService {
 			}
 		}
 		
-		return ResponseEntity.ok().body(saida);
+		return saida;
 	}
 
 	public ArrayList<Compra> produtosIndustrializados(ArrayList<Compra> compras) {

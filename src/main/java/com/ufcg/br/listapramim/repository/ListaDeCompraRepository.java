@@ -12,4 +12,6 @@ public interface ListaDeCompraRepository extends MongoRepository<ListaDeCompra,O
 	
 	ListaDeCompra findListaBy_id(ObjectId id);
 
+	ListaDeCompra findProdutoByDescritor(String descritor);
+
 }

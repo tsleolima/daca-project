@@ -1,11 +1,13 @@
 package com.ufcg.br.listapramim.service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.ufcg.br.listapramim.model.Compra;
@@ -26,32 +28,32 @@ public class ListaDeCompraService {
 	}
 
 	public ListaDeCompra cadastrarProduto(ListaDeCompra lista) {
-		return this.listaDeCompraRepository.save(lista);
+		if(this.listaDeCompraRepository.findProdutoByDescritor(lista.getDescritor()) == null) {
+			return this.listaDeCompraRepository.save(lista);
+		} 
+		return null;
 	}
 
-	public ResponseEntity<ListaDeCompra> atualizarLista(ObjectId id, ListaDeCompra lista) {
+	public ListaDeCompra atualizarLista(ObjectId id, ListaDeCompra lista) {
 		ListaDeCompra listaBuscada = this.listaDeCompraRepository.findListaBy_id(id);
 		if(listaBuscada != null) {
 			listaBuscada.setCompras(lista.getCompras());
 			listaBuscada.setDescritor(lista.getDescritor());
 			listaBuscada.setLocalCompra(lista.getLocalCompra());
 			listaBuscada.setValorFinal(lista.getValorFinal());
-			this.listaDeCompraRepository.delete(listaBuscada);
-			ListaDeCompra listaatt = this.listaDeCompraRepository.save(lista);
-			return ResponseEntity.ok().body(listaatt);
-		} else return ResponseEntity.notFound().build();
+			ListaDeCompra listaatt = this.listaDeCompraRepository.save(listaBuscada);
+			return listaatt;
+		} else return listaBuscada;
 		
 	}
 
-	public ResponseEntity<ListaDeCompra> removerLista(ObjectId id) {
+	public ListaDeCompra removerLista(ObjectId id) {
 		ListaDeCompra lista = this.listaDeCompraRepository.findListaBy_id(id);
-		if(lista != null) {
-			 this.listaDeCompraRepository.delete(lista);
-			 return ResponseEntity.ok().build();
-		} else return ResponseEntity.notFound().build();
+		if(lista != null) this.listaDeCompraRepository.delete(lista);
+		return lista;
 	}
 
-	public ResponseEntity<ListaDeCompra> getListaCompra(ObjectId id) {
+	public ListaDeCompra getListaCompra(ObjectId id) {
 		ListaDeCompra listaBuscada = this.listaDeCompraRepository.findListaBy_id(id);		
 		ArrayList<Compra> comprasOrdenadas = new ArrayList<Compra>();
 		comprasOrdenadas.addAll(produtosHigienePessoal(listaBuscada.getCompras()));
@@ -60,7 +62,7 @@ public class ListaDeCompraService {
 		comprasOrdenadas.addAll(produtosNaoIndustrializados(listaBuscada.getCompras()));
 		
 		listaBuscada.setCompras(comprasOrdenadas);		
-		return ResponseEntity.ok().body(listaBuscada);
+		return listaBuscada;
 	}
 	
 	public ArrayList<Compra> produtosIndustrializados(ArrayList<Compra> compras) {
@@ -77,5 +79,41 @@ public class ListaDeCompraService {
 	
 	public ArrayList<Compra> produtosHigienePessoal(ArrayList<Compra> compras) {
 		return this.produtoService.produtosHigienePessoal(compras);
+	}
+	
+	public ListaDeCompra buscarListaDescritor(String descritor) {
+		ListaDeCompra listaBuscada = this.listaDeCompraRepository.findProdutoByDescritor(descritor);
+		return listaBuscada;
+	}
+	
+	public ListaDeCompra buscarListaProduto(ObjectId idProduto) {
+		ArrayList<ListaDeCompra> listas = (ArrayList<ListaDeCompra>) this.listaDeCompraRepository.findAll();
+		ArrayList<ListaDeCompra> listasBuscadas = new ArrayList<ListaDeCompra>();
+		for (ListaDeCompra lista : listas) {
+			ArrayList<Compra> compras = lista.getCompras();
+			for (Compra compra : compras) {
+				
+			}
+		}
+	}
+
+	public ArrayList<ListaDeCompra> buscarListaData(String data) {
+		ArrayList<ListaDeCompra> listas = (ArrayList<ListaDeCompra>) this.listaDeCompraRepository.findAll();
+		ArrayList<ListaDeCompra> listasBuscadas = new ArrayList<ListaDeCompra>();
+		for (ListaDeCompra lista : listas) {
+			String[] splitedDateList = lista.get_id().getDate().toString().split(" ");
+			String dateFormat = splitedDateList[1] + " " + splitedDateList[2] + " " + splitedDateList[5];
+			if(data.equals(formatDateList(dateFormat))) {
+				listasBuscadas.add(lista);
+			}
+		}
+		
+		return listasBuscadas;
+	}
+	
+	private String formatDateList(String string) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd yyyy", Locale.ENGLISH);
+		LocalDate date = LocalDate.parse(string, formatter);
+		return date.toString();
 	}
 }

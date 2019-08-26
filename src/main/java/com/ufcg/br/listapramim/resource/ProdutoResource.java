@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,47 +29,91 @@ public class ProdutoResource {
 	private ProdutoService produtoService;
 	
 	@GetMapping
-	public List<Produto> getProdutos(){
-		return this.produtoService.getProdutos();
+	public ResponseEntity<List<Produto>> getProdutos(){
+		List<Produto> produtos = this.produtoService.getProdutos();
+		if(produtos.size() > 0) {
+			return ResponseEntity.ok().body(produtos);
+		} else {
+			return ResponseEntity.noContent().build();
+		}
 	}
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<Produto> getProduto(@PathVariable ObjectId id) {
-		return this.produtoService.getProduto(id);
+		Produto produto = this.produtoService.getProduto(id);
+		System.out.println(id);
+		if(produto != null) {
+			return ResponseEntity.ok().body(produto);
+		}
+		return ResponseEntity.notFound().build();
 	}
 	
 	@GetMapping("/ordered")
 	public ResponseEntity<ArrayList<Produto>> getProdutosOrdenados(){
-		return this.produtoService.getProdutosOrdenados();
+		ArrayList<Produto> produtos = this.produtoService.getProdutosOrdenados();
+		if(produtos.size() > 0) {
+			return ResponseEntity.ok().body(produtos);
+		} else {
+			return ResponseEntity.noContent().build();
+		}
 	}
 	
 	@GetMapping("/ordered/{categoria}")
 	public ResponseEntity<ArrayList<Produto>> getProdutosOrdenadosCategoria(@PathVariable String categoria){
-		return this.produtoService.getProdutosOrdenadosCategoria(categoria);
+		ArrayList<Produto> produtos = this.produtoService.getProdutosOrdenadosCategoria(categoria);
+		if(produtos.size() > 0) {
+			return ResponseEntity.ok().body(produtos);
+		} else {
+			return ResponseEntity.noContent().build();
+		}
 	}
 	
 	@GetMapping("/ordered/preco")
-	public List<ItemVenda> getProdutosOrdenadosPreco(){
-		return this.produtoService.getProdutosOrdenadosPreco();
+	public ResponseEntity<ArrayList<ItemVenda>> getProdutosOrdenadosPreco(){
+		ArrayList<ItemVenda> itensVenda = this.produtoService.getProdutosOrdenadosPreco();
+		if(itensVenda.size() > 0) {
+			return ResponseEntity.ok().body(itensVenda);
+		} else {
+			return ResponseEntity.noContent().build();
+		}
 	}
 	
 	@GetMapping("/search/{nome}")
 	public ResponseEntity<ArrayList<Produto>> pesquisaProdutoNome(@PathVariable String nome){
-		return this.produtoService.pesquisaProdutoNome(nome);
+		ArrayList<Produto> produtos = this.produtoService.pesquisaProdutoNome(nome);
+		if(produtos.size() > 0) {
+			return ResponseEntity.ok().body(produtos);
+		} else {
+			return ResponseEntity.noContent().build();
+		}
 	}
 	
 	@PostMapping
-	public Produto cadastrarProduto(@RequestBody ProdutoDAO produto) {
-		return this.produtoService.cadastrarProduto(produto);
+	public ResponseEntity<Produto> cadastrarProduto(@RequestBody ProdutoDAO produtoAdd) {
+		Produto produto = this.produtoService.cadastrarProduto(produtoAdd);
+		if(produto != null) {
+			return ResponseEntity.ok().body(produto);
+		}
+		return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<Produto> atualizarProduto (@PathVariable ObjectId id, @RequestBody Produto produto) {
-		return this.produtoService.atualizarProduto(id,produto);
+	public ResponseEntity<Produto> atualizarProduto (@PathVariable ObjectId id, @RequestBody Produto produtoAtt) {
+		Produto produto = this.produtoService.atualizarProduto(id,produtoAtt);
+		if(produto != null) {
+			return ResponseEntity.ok().body(produto);
+		} else {
+			return ResponseEntity.notFound().build();
+		}
 	}
 	
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> deletarProduto (@PathVariable ObjectId id) {
-		return this.produtoService.deletarProduto(id);
+		Produto produto = this.produtoService.deletarProduto(id);
+		if(produto != null) {
+			return ResponseEntity.ok().build();
+		} else {
+			return ResponseEntity.notFound().build();
+		}
 	}
 }
