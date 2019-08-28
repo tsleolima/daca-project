@@ -8,9 +8,10 @@ public class Compra {
 	private String nomeProduto;
 	private ObjectId idProduto;
 	
-	public Compra(int quantidade, ObjectId idProduto) {
+	public Compra(int quantidade, ObjectId idProduto, String nomeProduto) {
 		this.quantidade = quantidade;
 		this.idProduto = idProduto;
+		this.nomeProduto = nomeProduto;
 	}
 
 	public int getQuantidade() {

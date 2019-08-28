@@ -78,7 +78,7 @@ public class ListaDeCompraResource {
 		return ResponseEntity.ok().body(this.listaDeCompraService.buscarListaDescritor(descritor));
 	}
 	
-	@GetMapping("/search/data/{data}")
+	@GetMapping("/search/data/{data}") // dd-mm-yyyy
 	public ResponseEntity<ArrayList<ListaDeCompra>> buscarListaData(@PathVariable String data){
 		return ResponseEntity.ok().body(this.listaDeCompraService.buscarListaData(data));
 	}
@@ -95,8 +95,8 @@ public class ListaDeCompraResource {
 		return ResponseEntity.noContent().build();
 	}
 	
-	@GetMapping("/automatic/itemcompra")
-	public ResponseEntity<ListaDeCompra> gerarListaItemCompra(ObjectId idProduto){
+	@GetMapping("/automatic/itemcompra/{idProduto}")
+	public ResponseEntity<ListaDeCompra> gerarListaItemCompra(@PathVariable ObjectId idProduto){
 		ListaDeCompra lista = this.listaDeCompraService.gerarListaItemCompra(idProduto);
 		if(lista != null) return ResponseEntity.ok().body(lista);
 		return ResponseEntity.noContent().build();

@@ -35,6 +35,7 @@ public class ListaDeCompraService {
 
 	public ListaDeCompra cadastrarLista(ListaDeCompra lista) {
 		if(this.listaDeCompraRepository.findProdutoByDescritor(lista.getDescritor()) == null) {
+			if(lista.getCompras() == null) lista.setCompras(new ArrayList<Compra>());
 			return this.listaDeCompraRepository.save(lista);
 		} 
 		return null;
@@ -66,7 +67,7 @@ public class ListaDeCompraService {
 		comprasOrdenadas.addAll(produtosLimpeza(listaBuscada.getCompras()));
 		comprasOrdenadas.addAll(produtosIndustrializados(listaBuscada.getCompras()));
 		comprasOrdenadas.addAll(produtosNaoIndustrializados(listaBuscada.getCompras()));
-		
+			
 		listaBuscada.setCompras(comprasOrdenadas);		
 		return listaBuscada;
 	}
@@ -134,11 +135,11 @@ public class ListaDeCompraService {
 		ArrayList<ListaDeCompra> listas = (ArrayList<ListaDeCompra>) this.listaDeCompraRepository.findAll();
 		if (listas.size() > 0) {
 			ListaDeCompra ultimaLista = listas.get(listas.size()-1);
-			ultimaLista.setLocalCompra("");
-			ultimaLista.setValorFinal(0);
-			ultimaLista.setDescritor("Lista Automatica Data" + " " + ultimaLista.getDescritor() + " " + formatDateList(formatDateObjectId(ultimaLista)));
-			this.cadastrarLista(ultimaLista);
-			return ultimaLista;
+			ListaDeCompra novaLista = new ListaDeCompra();
+			novaLista.setCompras(ultimaLista.getCompras());
+			novaLista.setDescritor("Lista Automatica Data" + " " + formatDateList(formatDateObjectId(ultimaLista)));
+			this.cadastrarLista(novaLista);
+			return novaLista;
 		}
 		return null;
 	}
@@ -148,12 +149,12 @@ public class ListaDeCompraService {
 		for (int i = listas.size()-1; i >= 0 ; i--) {
 			for (Compra compra : listas.get(i).getCompras()) {
 				if(compra.getIdProduto().equals(idProduto)) {
-					ListaDeCompra ultimaListaComProduto = listas.get(listas.size()-1);
-					ultimaListaComProduto.setLocalCompra("");
-					ultimaListaComProduto.setValorFinal(0);
-					ultimaListaComProduto.setDescritor("Lista Automatica Produto" + " " + ultimaListaComProduto.getDescritor() + " " + formatDateList(formatDateObjectId(ultimaListaComProduto)));
-					this.cadastrarLista(ultimaListaComProduto);
-					return ultimaListaComProduto;
+					ListaDeCompra ultimaListaComProduto = listas.get(i);
+					ListaDeCompra novaLista = new ListaDeCompra();
+					novaLista.setCompras(ultimaListaComProduto.getCompras());
+					novaLista.setDescritor("Lista Automatica Produto" + " " + formatDateList(formatDateObjectId(ultimaListaComProduto)));
+					this.cadastrarLista(novaLista);
+					return novaLista;
 				}
 			}
 		}
@@ -164,36 +165,29 @@ public class ListaDeCompraService {
 		ArrayList<ListaDeCompra> listas = (ArrayList<ListaDeCompra>) this.listaDeCompraRepository.findAll();
 		ArrayList<Compra> totalCompras = new ArrayList<Compra>();
 		ListaDeCompra listaFinal = new ListaDeCompra();
+		listaFinal.setCompras(new ArrayList<Compra>());
 		for (ListaDeCompra lista : listas) {
 			totalCompras.addAll(lista.getCompras());
 		}
 
         Map<ObjectId,List<Compra>> mapCompras = new HashMap<>();
-        
-        for(Compra c : totalCompras){
-            if(!mapCompras.containsKey(c.getIdProduto())){
-                mapCompras.put(c.getIdProduto(), new ArrayList<Compra>());                
-            }
-            mapCompras.get(c.getIdProduto()).add(c);
-        }
-        
         mapCompras = totalCompras.stream()
         		.collect(Collectors.groupingBy(Compra::getIdProduto));
-
     
         for (Entry<ObjectId, List<Compra>> entry : mapCompras.entrySet()) {
         	int numeroDeCompras = entry.getValue().size();
-        	int mediaDeCompras  = numeroDeCompras / listas.size();
-        	if(mediaDeCompras >= (listas.size()/2)) {
-        		SimpleDateFormat formatter= new SimpleDateFormat("dd-MM-yyyy");
-        		Date date = new Date();        				
-        		listaFinal.setDescritor("Lista Automatica Compras" + " " + formatter.format(date).toString());
+    		SimpleDateFormat formatter= new SimpleDateFormat("dd-MM-yyyy");
+    		Date date = new Date(); 
+        	listaFinal.setDescritor("Lista Automatica Compras" + " " + formatter.format(date).toString());
+        	if(numeroDeCompras >= (listas.size()/2)) {
         		int quantidade = mediaDaQuantidadeCompra(entry.getValue());
-        		Compra compraMaisFrequente = new Compra(quantidade, entry.getValue().get(0).getIdProduto());
-        		listaFinal.getCompras().add(compraMaisFrequente);
+        		Compra compraMaisFrequente = new Compra(quantidade, entry.getValue().get(0).getIdProduto(), entry.getValue().get(0).getNomeProduto());
+        		ArrayList<Compra> comprasListaFinal = listaFinal.getCompras();
+        		comprasListaFinal.add(compraMaisFrequente);
+        		listaFinal.setCompras(comprasListaFinal);
         	}
         }
-        
+        this.cadastrarLista(listaFinal);
         return listaFinal;
 	}
 

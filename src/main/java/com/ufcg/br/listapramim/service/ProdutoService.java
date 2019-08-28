@@ -101,7 +101,7 @@ public class ProdutoService {
 		for (Produto produto : produtos) {
 			String[] palavrasProduto = produto.getNome().split(" ");
 			for (String palavra : palavrasProduto) {
-				if(palavra.toLowerCase().equals(nome)) {
+				if(palavra.toLowerCase().equals(nome.toLowerCase())) {
 					saida.add(produto);
 				}
 			}
