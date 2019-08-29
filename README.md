@@ -79,7 +79,6 @@ O Lista pra mim possui funcionalidades como:
     - GET gera uma lista automaticamente baseando-se nas compras mais encontradas nas listas, a regra é os produtos que contemplam pelo menos metade das listas `localhost:8080/listacompra/automatic/maisfrequentes`
     - GET o lista pra mim sugere os estabelicimentos, dos quais foram utilizados para atualização produtos, que possuem pelo menos um produto da lista que deseja ser comprada, mostrando um pequeno relatório de local de venda e preço final da lista caso comprada no estabelicimento proposto `localhost:8080/listacompra/suggestion/{idlista}`
     
-
 ### Arquitetura
 
-![](https://raw.githubusercontent.com/tsleolima/daca-project/master/assets/ListaPraMim-Diagram.jpg)
+![](https://raw.githubusercontent.com/tsleolima/daca-project/master/assets/diagram.jpg)
