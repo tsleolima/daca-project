@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.ufcg.br.listapramim.model.Compra;
 import com.ufcg.br.listapramim.model.ItemVenda;
+import com.ufcg.br.listapramim.model.ListaDeCompra;
 import com.ufcg.br.listapramim.model.Produto;
 import com.ufcg.br.listapramim.model.ProdutoDAO;
 import com.ufcg.br.listapramim.model.enums.Categoria;
@@ -144,6 +145,17 @@ public class ProdutoService {
 		
 		Collections.sort(comprasCategoriaSelecionada, new CompraNomeComparator());
 		return comprasCategoriaSelecionada;
+	}
+
+	public ArrayList<Produto> getProdutosComPreco(ListaDeCompra lista) {
+		ArrayList<Produto> produtos = new ArrayList<Produto>();
+		for (Compra compra : lista.getCompras()) {
+			Produto produto = this.getProduto(compra.getIdProduto());
+			if(produto.getMapaDePrecos() != null) {
+				produtos.add(produto);
+			}
+		}
+		return produtos;
 	}
 	
 }

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.validation.constraints.NotEmpty;
+
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 
@@ -11,9 +13,14 @@ public class ListaDeCompra {
 
 	@Id
 	private ObjectId _id;
+	
+	@NotEmpty(message = "O descritor não pode ser vazio")
 	private String descritor;
+	
 	private double valorFinal;
+	
 	private String localCompra;
+	
 	private ArrayList<Compra> compras;
 	
 	public ListaDeCompra(String descritor) {

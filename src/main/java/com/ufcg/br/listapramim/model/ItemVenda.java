@@ -1,9 +1,16 @@
 package com.ufcg.br.listapramim.model;
 
+import javax.validation.constraints.NotEmpty;
+
 public class ItemVenda {
 	
+	@NotEmpty(message = "O nome do produto não pode ser vazio")
 	private String nomeProduto;
+	
+	@NotEmpty(message = "O nome local de venda não pode ser vazio")
 	private String nomeLocalVenda;
+	
+	@NotEmpty(message = "O preço não pode ser vazio")
 	private double preco;
 	
 	public String getNomeProduto() {

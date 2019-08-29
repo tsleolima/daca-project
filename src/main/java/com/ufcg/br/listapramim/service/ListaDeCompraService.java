@@ -17,7 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ufcg.br.listapramim.model.Compra;
+import com.ufcg.br.listapramim.model.ItemVenda;
 import com.ufcg.br.listapramim.model.ListaDeCompra;
+import com.ufcg.br.listapramim.model.Produto;
+import com.ufcg.br.listapramim.model.SugestaoDAO;
 import com.ufcg.br.listapramim.repository.ListaDeCompraRepository;
 
 @Service
@@ -198,6 +201,34 @@ public class ListaDeCompraService {
 		}
 		int media = Math.floorDiv(quantidade,compras.size());
 		return media;
+	}
+
+	public ArrayList<SugestaoDAO> sugerirLocalDeCompra(ObjectId id) {
+		ListaDeCompra lista = this.listaDeCompraRepository.findListaBy_id(id);
+		ArrayList<Produto> produtosComPreco = this.produtoService.getProdutosComPreco(lista);
+		
+		ArrayList<SugestaoDAO> sugestoes = new ArrayList<SugestaoDAO>();
+		
+		if(produtosComPreco.size() > 0) {
+			ArrayList<ItemVenda> itensAvenda = new ArrayList<ItemVenda>();
+			for (Produto p : produtosComPreco) {
+				itensAvenda.addAll(p.getMapaDePrecos());
+			}
+
+	        Map<String,List<ItemVenda>> mapItem = new HashMap<>();
+	        mapItem = itensAvenda.stream()
+	        		.collect(Collectors.groupingBy(ItemVenda::getNomeLocalVenda));
+	        
+	        for (Entry<String, List<ItemVenda>> entry : mapItem.entrySet()) {
+	        	double precoFinal = 0;
+	        	for (ItemVenda itemVenda : entry.getValue()) {
+					precoFinal += itemVenda.getPreco();
+				}
+	        	SugestaoDAO s = new SugestaoDAO(entry.getKey(),precoFinal,entry.getValue());
+	        	sugestoes.add(s);
+	        }
+			return sugestoes;
+		}else return null;
 	}
 
 }

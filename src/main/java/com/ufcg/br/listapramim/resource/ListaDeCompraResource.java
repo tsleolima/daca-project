@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ufcg.br.listapramim.model.ListaDeCompra;
+import com.ufcg.br.listapramim.model.SugestaoDAO;
 import com.ufcg.br.listapramim.service.ListaDeCompraService;
 
 @RestController
@@ -106,6 +107,13 @@ public class ListaDeCompraResource {
 	public ResponseEntity<ListaDeCompra> gerarListaProdutosMaisFrequentes(){
 		ListaDeCompra lista = this.listaDeCompraService.gerarListaProdutosMaisFrequentes();
 		if(lista != null) return ResponseEntity.ok().body(lista);
+		return ResponseEntity.noContent().build();
+	}
+	
+	@GetMapping("/suggestion/{id}")
+	public ResponseEntity<ArrayList<SugestaoDAO>> sugerirLocalDeCompra(@PathVariable ObjectId id){
+		ArrayList<SugestaoDAO> sugestoes = this.listaDeCompraService.sugerirLocalDeCompra(id);
+		if(sugestoes != null) return ResponseEntity.ok().body(sugestoes);
 		return ResponseEntity.noContent().build();
 	}
 	

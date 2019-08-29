@@ -2,6 +2,9 @@ package com.ufcg.br.listapramim.model;
 
 import java.util.ArrayList;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -15,12 +18,20 @@ public class Produto {
 	private static final String VALORPADRAO = "1";
 
 	@Id
+	@NotEmpty(message = "O ID não pode ser vazio")
 	public ObjectId _id;
 	
+	@NotEmpty(message = "O nome não pode ser vazio")
 	private String nome;
+	
+	@NotNull
 	private Categoria categoria;
+	
+	@NotNull
 	private Tipo tipo;
+	
 	private ArrayList<ItemVenda> mapaDePrecos;
+	
 	private String quantidade;
 	
 	public Produto () {}

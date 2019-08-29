@@ -1,11 +1,18 @@
 package com.ufcg.br.listapramim.model;
 
+import javax.validation.constraints.NotEmpty;
+
 import org.bson.types.ObjectId;
 
 public class Compra {
 	
+	@NotEmpty(message = "A quantidade não pode ser vazio")
 	private int quantidade;
+	
+	@NotEmpty(message = "O nome do não pode ser vazio")
 	private String nomeProduto;
+	
+	@NotEmpty(message = "O ID não pode ser vazio")
 	private ObjectId idProduto;
 	
 	public Compra(int quantidade, ObjectId idProduto, String nomeProduto) {

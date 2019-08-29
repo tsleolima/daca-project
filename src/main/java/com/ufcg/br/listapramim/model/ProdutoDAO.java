@@ -1,10 +1,19 @@
 package com.ufcg.br.listapramim.model;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 public class ProdutoDAO {
 	
+	@NotEmpty(message = "O nome não pode ser vazio")
 	private String nome;
+	
+	@NotNull
 	private String categoria;
+	
+	@NotNull
 	private String tipo;
+
 	private String quantidade;
 	
 	public String getNome() {
