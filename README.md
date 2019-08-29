@@ -19,4 +19,4 @@ O Lista pra mim possui funcionalidades como:
 
 ### Arquitetura
 
-![](https://pandao.github.io/editor.md/examples/images/4.jpg)
+![](https://raw.githubusercontent.com/tsleolima/daca-project/master/assets/ListaPraMim-Diagram.jpg)
