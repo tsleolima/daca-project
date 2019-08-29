@@ -19,13 +19,14 @@ Utilize algum serviço para consumir a API fornecida, futuramente desenvolveremo
 ### Features
 
 Os produtos apresentam certas características:
-#####Categoria:
+
+**Categoria**:
 - ALIMENTOSINDUSTRIALIZADOS
 - ALIMENTOSNAOINDUSTRIALIZADOS
 - LIMPEZA
 - HIGIENEPESSOAL 
 
-#####Tipo:
+**Tipo**:
 - QUANTIDADE_FIXA 
 - NAO_INDUS_QUILO
 - INDUS_UNI
