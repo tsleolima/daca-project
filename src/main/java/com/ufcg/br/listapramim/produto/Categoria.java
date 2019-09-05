@@ -1,4 +1,4 @@
-package com.ufcg.br.listapramim.model.enums;
+package com.ufcg.br.listapramim.produto;
 
 public enum Categoria {
 	

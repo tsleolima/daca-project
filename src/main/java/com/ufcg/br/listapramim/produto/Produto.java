@@ -1,4 +1,4 @@
-package com.ufcg.br.listapramim.model;
+package com.ufcg.br.listapramim.produto;
 
 import java.util.ArrayList;
 
@@ -8,9 +8,6 @@ import javax.validation.constraints.NotNull;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import com.ufcg.br.listapramim.model.enums.Categoria;
-import com.ufcg.br.listapramim.model.enums.Tipo;
 
 @Document(collection="produto")
 public class Produto {

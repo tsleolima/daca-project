@@ -1,7 +1,9 @@
-package com.ufcg.br.listapramim.resource;
+package com.ufcg.br.listapramim.produto;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.validation.Validation;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +17,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.ufcg.br.listapramim.model.ItemVenda;
-import com.ufcg.br.listapramim.model.Produto;
-import com.ufcg.br.listapramim.model.ProdutoDAO;
-import com.ufcg.br.listapramim.service.ProdutoService;
 
 @RestController
 @RequestMapping({"/produto"})

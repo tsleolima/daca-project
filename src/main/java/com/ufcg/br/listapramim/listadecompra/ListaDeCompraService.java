@@ -1,4 +1,4 @@
-package com.ufcg.br.listapramim.service;
+package com.ufcg.br.listapramim.listadecompra;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -16,12 +16,9 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.ufcg.br.listapramim.model.Compra;
-import com.ufcg.br.listapramim.model.ItemVenda;
-import com.ufcg.br.listapramim.model.ListaDeCompra;
-import com.ufcg.br.listapramim.model.Produto;
-import com.ufcg.br.listapramim.model.SugestaoDAO;
-import com.ufcg.br.listapramim.repository.ListaDeCompraRepository;
+import com.ufcg.br.listapramim.produto.ItemVenda;
+import com.ufcg.br.listapramim.produto.Produto;
+import com.ufcg.br.listapramim.produto.ProdutoService;
 
 @Service
 public class ListaDeCompraService {

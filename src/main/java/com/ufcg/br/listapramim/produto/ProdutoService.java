@@ -1,4 +1,4 @@
-package com.ufcg.br.listapramim.service;
+package com.ufcg.br.listapramim.produto;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,16 +9,10 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.ufcg.br.listapramim.model.Compra;
-import com.ufcg.br.listapramim.model.ItemVenda;
-import com.ufcg.br.listapramim.model.ListaDeCompra;
-import com.ufcg.br.listapramim.model.Produto;
-import com.ufcg.br.listapramim.model.ProdutoDAO;
-import com.ufcg.br.listapramim.model.enums.Categoria;
-import com.ufcg.br.listapramim.repository.ProdutoRepository;
-import com.ufcg.br.listapramim.util.CompraNomeComparator;
-import com.ufcg.br.listapramim.util.ItemVendaPrecoComparator;
-import com.ufcg.br.listapramim.util.ProdutoNomeComparator;
+import com.ufcg.br.listapramim.listadecompra.Compra;
+import com.ufcg.br.listapramim.listadecompra.CompraNomeComparator;
+import com.ufcg.br.listapramim.listadecompra.ItemVendaPrecoComparator;
+import com.ufcg.br.listapramim.listadecompra.ListaDeCompra;
 
 @Service
 public class ProdutoService {

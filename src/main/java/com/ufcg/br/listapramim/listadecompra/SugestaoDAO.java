@@ -1,7 +1,9 @@
-package com.ufcg.br.listapramim.model;
+package com.ufcg.br.listapramim.listadecompra;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.ufcg.br.listapramim.produto.ItemVenda;
 
 public class SugestaoDAO {
 	

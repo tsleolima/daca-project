@@ -1,4 +1,4 @@
-package com.ufcg.br.listapramim.model;
+package com.ufcg.br.listapramim.produto;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;

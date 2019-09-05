@@ -1,7 +1,11 @@
-package com.ufcg.br.listapramim.resource;
+package com.ufcg.br.listapramim.listadecompra;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +19,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.ufcg.br.listapramim.model.ListaDeCompra;
-import com.ufcg.br.listapramim.model.SugestaoDAO;
-import com.ufcg.br.listapramim.service.ListaDeCompraService;
 
 @RestController
 @RequestMapping({"/listacompra"})
@@ -49,6 +49,10 @@ public class ListaDeCompraResource {
 	
 	@PostMapping
 	public ResponseEntity<ListaDeCompra> cadastrarLista (@RequestBody ListaDeCompra listaAdd) {
+		Set<ConstraintViolation<ListaDeCompra>> validate = Validation.buildDefaultValidatorFactory().getValidator().validate(listaAdd);
+		if (!validate.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
 		ListaDeCompra lista = this.listaDeCompraService.cadastrarLista(listaAdd);
 		if(lista != null) {
 			return ResponseEntity.ok().body(lista);

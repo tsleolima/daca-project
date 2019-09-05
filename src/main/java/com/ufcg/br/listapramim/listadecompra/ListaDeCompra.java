@@ -1,4 +1,4 @@
-package com.ufcg.br.listapramim.model;
+package com.ufcg.br.listapramim.listadecompra;
 
 import java.util.ArrayList;
 import java.util.HashSet;
