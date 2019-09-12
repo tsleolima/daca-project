@@ -1,7 +1,7 @@
 package com.ufcg.br.listapramim.seguranca;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ufcg.br.listapramim.usuario.UserCredentials;
+import com.ufcg.br.listapramim.usuario.User;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,8 +29,8 @@ public class JWTLoginFilter extends AbstractAuthenticationProcessingFilter {
     public Authentication attemptAuthentication(
             HttpServletRequest req, HttpServletResponse res)
             throws AuthenticationException, IOException, ServletException {
-        UserCredentials creds = new ObjectMapper().readValue(req.getInputStream(), UserCredentials.class);
-
+        User creds = new ObjectMapper().readValue(req.getInputStream(), User.class);
+        System.out.println(creds.getRole());
         return getAuthenticationManager().authenticate(
                 new UsernamePasswordAuthenticationToken(
                         creds.getUsername(),

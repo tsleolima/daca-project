@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping({"/listacompra"})
-public class ListaDeCompraResource {
+public class ListaDeCompraController {
 
 	@Autowired
 	private ListaDeCompraService listaDeCompraService;
