@@ -1,9 +1,7 @@
 package com.ufcg.br.listapramim.seguranca;
 
 import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,10 +14,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
-
 import com.ufcg.br.listapramim.usuario.CustomUserDetailsService;
-import com.ufcg.br.listapramim.usuario.Role;
-import com.ufcg.br.listapramim.usuario.RoleRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -40,9 +35,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	    http.httpBasic().disable().csrf().disable().sessionManagement()
 	            .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().authorizeRequests()
 	            .antMatchers("/api/auth/login").permitAll().antMatchers("/api/auth/register").permitAll()
-	            .antMatchers("/api/products/**").hasAuthority("ADMIN").anyRequest().authenticated().and().csrf()
+	            .antMatchers("/api/produto/**").hasAuthority("ADMIN").anyRequest().authenticated()
+	            .antMatchers("/api/listacompra/**").hasAuthority("ADMIN").anyRequest().authenticated()
+	            .and().csrf()
 	            .disable().exceptionHandling().authenticationEntryPoint(unauthorizedEntryPoint()).and()
 	            .apply(new JwtConfigurer(jwtTokenProvider));
+	    
 	}
 	
 	@Bean
@@ -67,17 +65,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	    return new CustomUserDetailsService();
 	}
 	
-	@Bean
-	CommandLineRunner init(RoleRepository roleRepository) {
-	    return args -> {
-
-	        Role adminRole = roleRepository.findByRole("ADMIN");
-	        if (adminRole == null) {
-	            Role newAdminRole = new Role();
-	            newAdminRole.setRole("ADMIN");
-	            roleRepository.save(newAdminRole);
-	        }
-	    };
-
-	}
+	// Usado para adicionar role admin no db
+//	@Bean
+//	CommandLineRunner init(RoleRepository roleRepository) {
+//	    return args -> {
+//
+//	        Role adminRole = roleRepository.findByRole("ADMIN");
+//	        if (adminRole == null) {
+//	            Role newAdminRole = new Role();
+//	            newAdminRole.setRole("ADMIN");
+//	            roleRepository.save(newAdminRole);
+//	        }
+//	    };
+//
+//	}
+	
 }
