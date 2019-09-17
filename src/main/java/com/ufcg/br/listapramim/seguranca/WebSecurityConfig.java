@@ -1,72 +1,83 @@
 package com.ufcg.br.listapramim.seguranca;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 
-import com.ufcg.br.listapramim.usuario.UserService;
+import com.ufcg.br.listapramim.usuario.CustomUserDetailsService;
+import com.ufcg.br.listapramim.usuario.Role;
+import com.ufcg.br.listapramim.usuario.RoleRepository;
 
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-
-	@Autowired
-	CustomizeAuthenticationSuccessHandler customizeAuthenticationSuccessHandler;
 	
-	@Override
-    protected void configure(HttpSecurity httpSecurity) throws Exception {
-		httpSecurity.csrf().disable().authorizeRequests()
-			.antMatchers("/home").permitAll()
-			.antMatchers(HttpMethod.POST, "/login").permitAll()
-			.antMatchers(HttpMethod.POST, "/signup").permitAll()
-			.anyRequest().authenticated()
-			.and()
-			
-			// filtra requisições de login
-			.addFilterBefore(new JWTLoginFilter("/login", authenticationManager()), UsernamePasswordAuthenticationFilter.class)
-			
-			// filtra outras requisições para verificar a presença do JWT no header
-			.addFilterBefore(new JWTAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-	}
+	@Autowired
+	JwtTokenProvider jwtTokenProvider;
 	
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		// cria uma conta default
-		auth.inMemoryAuthentication()
-			.withUser("admin")
-			.password("{noop}password")
-			.roles("ADMIN");
-		
-		BCryptPasswordEncoder bCryptPasswordEncoder = passwordEncoder();
-	    UserService userDetailsService = mongoUserDetails();
-	    auth
-	        .userDetailsService(userDetailsService)
-	        .passwordEncoder(bCryptPasswordEncoder);
-	}
-	
-	@Bean
-	public BCryptPasswordEncoder passwordEncoder() {
-	    BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-	    return bCryptPasswordEncoder;
-	}
-	
-	@Bean
-	public UserService mongoUserDetails() {
-	    return new UserService();
+	    UserDetailsService userDetailsService = mongoUserDetails();
+	    auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder());
+
 	}
 	
 	@Override
-	public void configure(WebSecurity web) throws Exception {
-	    web
-	        .ignoring()
-	        .antMatchers("/resources/**", "/static/**", "/css/**", "/js/**", "/images/**");
+	protected void configure(HttpSecurity http) throws Exception {
+	    http.httpBasic().disable().csrf().disable().sessionManagement()
+	            .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().authorizeRequests()
+	            .antMatchers("/api/auth/login").permitAll().antMatchers("/api/auth/register").permitAll()
+	            .antMatchers("/api/products/**").hasAuthority("ADMIN").anyRequest().authenticated().and().csrf()
+	            .disable().exceptionHandling().authenticationEntryPoint(unauthorizedEntryPoint()).and()
+	            .apply(new JwtConfigurer(jwtTokenProvider));
+	}
+	
+	@Bean
+	public PasswordEncoder bCryptPasswordEncoder() {
+	    return new BCryptPasswordEncoder();
+	}
+
+	@Bean
+	@Override
+	public AuthenticationManager authenticationManagerBean() throws Exception {
+	    return super.authenticationManagerBean();
+	}
+
+	@Bean
+	public AuthenticationEntryPoint unauthorizedEntryPoint() {
+	    return (request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+	            "Unauthorized");
+	}
+
+	@Bean
+	public UserDetailsService mongoUserDetails() {
+	    return new CustomUserDetailsService();
+	}
+	
+	@Bean
+	CommandLineRunner init(RoleRepository roleRepository) {
+	    return args -> {
+
+	        Role adminRole = roleRepository.findByRole("ADMIN");
+	        if (adminRole == null) {
+	            Role newAdminRole = new Role();
+	            newAdminRole.setRole("ADMIN");
+	            roleRepository.save(newAdminRole);
+	        }
+	    };
+
 	}
 }
