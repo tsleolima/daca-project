@@ -23,9 +23,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	JwtTokenProvider jwtTokenProvider;
 	
+	@Autowired
+	CustomUserDetailsService userService;
+	
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-	    UserDetailsService userDetailsService = mongoUserDetails();
+	    UserDetailsService userDetailsService = userService;
 	    auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder());
 
 	}
@@ -59,13 +62,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	    return (request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
 	            "Unauthorized");
 	}
-
-	@Bean
-	public UserDetailsService mongoUserDetails() {
-	    return new CustomUserDetailsService();
-	}
 	
-	// Usado para adicionar role admin no db
+//	 Usado para adicionar role admin no db
 //	@Bean
 //	CommandLineRunner init(RoleRepository roleRepository) {
 //	    return args -> {

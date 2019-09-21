@@ -7,7 +7,10 @@ import javax.validation.constraints.NotNull;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import com.ufcg.br.listapramim.usuario.Users;
 
 @Document(collection="produto")
 public class Produto {
@@ -20,6 +23,9 @@ public class Produto {
 	
 	@NotEmpty(message = "O nome não pode ser vazio")
 	private String nome;
+	
+	@DBRef
+	private Users user;
 	
 	@NotNull
 	private Categoria categoria;
@@ -95,6 +101,14 @@ public class Produto {
 
 	public void setTipo(Tipo tipo) {
 		this.tipo = tipo;
+	}
+	
+	public Users getUser() {
+		return user;
+	}
+
+	public void setUser(Users user) {
+		this.user = user;
 	}
 
 	@Override

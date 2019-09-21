@@ -13,6 +13,7 @@ import com.ufcg.br.listapramim.listadecompra.Compra;
 import com.ufcg.br.listapramim.listadecompra.CompraNomeComparator;
 import com.ufcg.br.listapramim.listadecompra.ItemVendaPrecoComparator;
 import com.ufcg.br.listapramim.listadecompra.ListaDeCompra;
+import com.ufcg.br.listapramim.usuario.Users;
 
 @Service
 public class ProdutoService {
@@ -20,22 +21,29 @@ public class ProdutoService {
 	@Autowired
 	private ProdutoRepository produtoRepository;
 
-	public List<Produto> getProdutos () {
-		return this.produtoRepository.findAll();
+	public List<Produto> getProdutos (Users user) {
+		List<Produto> produtos = this.produtoRepository.findAll();
+		List<Produto> produtosUser = new ArrayList<Produto>();
+		for (int s = 0; s < produtos.size(); s++) {
+			if (produtos.get(s).getUser().getId().equals(user.getId())) {
+				produtosUser.add(produtos.get(s));
+			}
+		}
+		return produtosUser;
 	}
 	
 	public Produto getProduto(ObjectId id) {
 		return this.produtoRepository.findProdutoBy_id(id);
 	}	
 
-	public ArrayList<Produto> getProdutosOrdenados() {
-		ArrayList<Produto> produtos = (ArrayList<Produto>) this.produtoRepository.findAll();
-		Collections.sort(produtos, new ProdutoNomeComparator());
-		return produtos;
+	public ArrayList<Produto> getProdutosOrdenados(Users user) {
+		ArrayList<Produto> produtosUser = (ArrayList<Produto>) getProdutos(user);
+		Collections.sort(produtosUser, new ProdutoNomeComparator());
+		return produtosUser;
 	}
 
-	public ArrayList<Produto> getProdutosOrdenadosCategoria(String categoria) {
-		ArrayList<Produto> produtos = (ArrayList<Produto>) this.produtoRepository.findAll();
+	public ArrayList<Produto> getProdutosOrdenadosCategoria(Users user, String categoria) {
+		ArrayList<Produto> produtos = (ArrayList<Produto>) getProdutos(user);
 		produtos = (ArrayList<Produto>) produtos.stream()
 				.filter( produto -> produto.getCategoria().equals(Categoria.valueOf(categoria)))
 				.collect(Collectors.toList());
@@ -44,8 +52,8 @@ public class ProdutoService {
 		return produtos;
 	}
 
-	public ArrayList<ItemVenda> getProdutosOrdenadosPreco() {
-		ArrayList<Produto> produtos = (ArrayList<Produto>) this.produtoRepository.findAll();
+	public ArrayList<ItemVenda> getProdutosOrdenadosPreco(Users user) {
+		ArrayList<Produto> produtos = (ArrayList<Produto>) getProdutos(user);
 		ArrayList<ItemVenda> itensAvenda = new ArrayList<ItemVenda>();
 		for (Produto p : produtos) {
 			for (ItemVenda i : p.getMapaDePrecos()) {
@@ -56,17 +64,30 @@ public class ProdutoService {
 		return itensAvenda;
 	}
 	
-	public Produto cadastrarProduto(ProdutoDAO produto) {
+	public Produto cadastrarProduto(Users user, ProdutoDAO produto) {
 		Produto updated;
-		if(this.produtoRepository.findProdutoByNome(produto.getNome()) == null) {
+		ArrayList<Produto> produtosUser = (ArrayList<Produto>) getProdutos(user);
+		if(findProdutoByNome(produtosUser,produto.getNome()) == null) {
 			
 			if (produto.getQuantidade() != null) updated = new Produto(produto.getNome(),produto.getCategoria(),produto.getTipo(),produto.getQuantidade());
 			else updated = new Produto(produto.getNome(),produto.getCategoria(),produto.getTipo());
 			
+			System.out.println(user.getId().toString());
+			updated.setUser(user);
 			return this.produtoRepository.save(updated);
 			
 		} 
 		return null;
+	}
+
+	private Object findProdutoByNome(ArrayList<Produto> produtosUser, String nome) {
+		Produto produtofinal = null;
+		for (Produto produto : produtosUser) {
+			if(produto.getNome().equals(nome)) {
+				produtofinal = produto;
+			}
+		}
+		return produtofinal;
 	}
 
 	public Produto atualizarProduto(ObjectId id, Produto produto) {
@@ -90,8 +111,8 @@ public class ProdutoService {
 				
 	}
 
-	public ArrayList<Produto> pesquisaProdutoNome(String nome) {
-		ArrayList<Produto> produtos = (ArrayList<Produto>) this.produtoRepository.findAll();
+	public ArrayList<Produto> pesquisaProdutoNome(Users user, String nome) {
+		ArrayList<Produto> produtos = (ArrayList<Produto>) getProdutos(user);
 		ArrayList<Produto> saida = new ArrayList<Produto>();
 		for (Produto produto : produtos) {
 			String[] palavrasProduto = produto.getNome().split(" ");

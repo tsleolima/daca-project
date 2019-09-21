@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import com.ufcg.br.listapramim.produto.ItemVenda;
 import com.ufcg.br.listapramim.produto.Produto;
 import com.ufcg.br.listapramim.produto.ProdutoService;
+import com.ufcg.br.listapramim.usuario.Users;
 
 @Service
 public class ListaDeCompraService {
@@ -29,16 +30,36 @@ public class ListaDeCompraService {
 	@Autowired
 	private ProdutoService produtoService;
 	
-	public List<ListaDeCompra> getListas() {
-		return this.listaDeCompraRepository.findAll();
+	public List<ListaDeCompra> getListas(Users user) {
+		List<ListaDeCompra> listas = this.listaDeCompraRepository.findAll();
+		List<ListaDeCompra> listasUser = new ArrayList<ListaDeCompra>();
+		for (int s = 0; s < listas.size(); s++) {
+			if (listas.get(s).getUser().getId().equals(user.getId())) {
+				listasUser.add(listas.get(s));
+			}
+		}
+		return listasUser;
 	}
 
-	public ListaDeCompra cadastrarLista(ListaDeCompra lista) {
-		if(this.listaDeCompraRepository.findProdutoByDescritor(lista.getDescritor()) == null) {
+	public ListaDeCompra cadastrarLista(Users user, ListaDeCompra lista) {
+		ArrayList<ListaDeCompra> listasUser = (ArrayList<ListaDeCompra>) getListas(user);
+		if(findProdutoByDescritor(listasUser, lista.getDescritor()) == null) {
 			if(lista.getCompras() == null) lista.setCompras(new ArrayList<Compra>());
+			
+			lista.setUser(user);
 			return this.listaDeCompraRepository.save(lista);
 		} 
 		return null;
+	}
+
+	public ListaDeCompra findProdutoByDescritor(ArrayList<ListaDeCompra> listasUser, String descritor) {
+		ListaDeCompra lista = null;
+		for (ListaDeCompra listaDeCompra : listasUser) {
+			if(listaDeCompra.getDescritor().equals(descritor)){
+				lista = listaDeCompra;
+			}
+		}
+		return lista;
 	}
 
 	public ListaDeCompra atualizarLista(ObjectId id, ListaDeCompra lista) {
@@ -59,6 +80,8 @@ public class ListaDeCompraService {
 		if(lista != null) this.listaDeCompraRepository.delete(lista);
 		return lista;
 	}
+	
+	
 
 	public ListaDeCompra getListaCompra(ObjectId id) {
 		ListaDeCompra listaBuscada = this.listaDeCompraRepository.findListaBy_id(id);		
@@ -88,13 +111,9 @@ public class ListaDeCompraService {
 		return this.produtoService.produtosHigienePessoal(compras);
 	}
 	
-	public ListaDeCompra buscarListaDescritor(String descritor) {
-		ListaDeCompra listaBuscada = this.listaDeCompraRepository.findProdutoByDescritor(descritor);
-		return listaBuscada;
-	}
-	
-	public ArrayList<ListaDeCompra> buscarListaProduto(ObjectId idProduto) {
-		ArrayList<ListaDeCompra> listas = (ArrayList<ListaDeCompra>) this.listaDeCompraRepository.findAll();
+
+	public ArrayList<ListaDeCompra> buscarListaProduto(Users user, ObjectId idProduto) {
+		ArrayList<ListaDeCompra> listas = (ArrayList<ListaDeCompra>) getListas(user);
 		ArrayList<ListaDeCompra> listasBuscadas = new ArrayList<ListaDeCompra>();
 		for (ListaDeCompra listaDeCompra : listas) {
 			for ( Compra compra : listaDeCompra.getCompras()) {
@@ -106,8 +125,8 @@ public class ListaDeCompraService {
 		return listasBuscadas;
 	}
 
-	public ArrayList<ListaDeCompra> buscarListaData(String data) {
-		ArrayList<ListaDeCompra> listas = (ArrayList<ListaDeCompra>) this.listaDeCompraRepository.findAll();
+	public ArrayList<ListaDeCompra> buscarListaData(Users user, String data) {
+		ArrayList<ListaDeCompra> listas = (ArrayList<ListaDeCompra>) getListas(user);
 		ArrayList<ListaDeCompra> listasBuscadas = new ArrayList<ListaDeCompra>();
 		for (ListaDeCompra lista : listas) {
 			String dateFormat = formatDateObjectId(lista);
@@ -131,21 +150,21 @@ public class ListaDeCompraService {
 		return date.toString();
 	}
 
-	public ListaDeCompra gerarUltimaListaFinalizada() {
-		ArrayList<ListaDeCompra> listas = (ArrayList<ListaDeCompra>) this.listaDeCompraRepository.findAll();
+	public ListaDeCompra gerarUltimaListaFinalizada(Users user) {
+		ArrayList<ListaDeCompra> listas = (ArrayList<ListaDeCompra>) getListas(user);
 		if (listas.size() > 0) {
 			ListaDeCompra ultimaLista = listas.get(listas.size()-1);
 			ListaDeCompra novaLista = new ListaDeCompra();
 			novaLista.setCompras(ultimaLista.getCompras());
 			novaLista.setDescritor("Lista Automatica Data" + " " + formatDateList(formatDateObjectId(ultimaLista)));
-			this.cadastrarLista(novaLista);
+			this.cadastrarLista(user,novaLista);
 			return novaLista;
 		}
 		return null;
 	}
 
-	public ListaDeCompra gerarListaItemCompra(ObjectId idProduto) {
-		ArrayList<ListaDeCompra> listas = (ArrayList<ListaDeCompra>) this.listaDeCompraRepository.findAll();
+	public ListaDeCompra gerarListaItemCompra(Users user, ObjectId idProduto) {
+		ArrayList<ListaDeCompra> listas = (ArrayList<ListaDeCompra>) getListas(user);
 		for (int i = listas.size()-1; i >= 0 ; i--) {
 			for (Compra compra : listas.get(i).getCompras()) {
 				if(compra.getIdProduto().equals(idProduto)) {
@@ -153,7 +172,7 @@ public class ListaDeCompraService {
 					ListaDeCompra novaLista = new ListaDeCompra();
 					novaLista.setCompras(ultimaListaComProduto.getCompras());
 					novaLista.setDescritor("Lista Automatica Produto" + " " + formatDateList(formatDateObjectId(ultimaListaComProduto)));
-					this.cadastrarLista(novaLista);
+					this.cadastrarLista(user,novaLista);
 					return novaLista;
 				}
 			}
@@ -161,8 +180,8 @@ public class ListaDeCompraService {
 		return null;
 	}
 
-	public ListaDeCompra gerarListaProdutosMaisFrequentes() {
-		ArrayList<ListaDeCompra> listas = (ArrayList<ListaDeCompra>) this.listaDeCompraRepository.findAll();
+	public ListaDeCompra gerarListaProdutosMaisFrequentes(Users user) {
+		ArrayList<ListaDeCompra> listas = (ArrayList<ListaDeCompra>) getListas(user);
 		ArrayList<Compra> totalCompras = new ArrayList<Compra>();
 		ListaDeCompra listaFinal = new ListaDeCompra();
 		listaFinal.setCompras(new ArrayList<Compra>());
@@ -187,7 +206,7 @@ public class ListaDeCompraService {
         		listaFinal.setCompras(comprasListaFinal);
         	}
         }
-        this.cadastrarLista(listaFinal);
+        this.cadastrarLista(user,listaFinal);
         return listaFinal;
 	}
 
@@ -200,7 +219,7 @@ public class ListaDeCompraService {
 		return media;
 	}
 
-	public ArrayList<SugestaoDAO> sugerirLocalDeCompra(ObjectId id) {
+	public ArrayList<SugestaoDAO> sugerirLocalDeCompra(Users user,ObjectId id) {
 		ListaDeCompra lista = this.listaDeCompraRepository.findListaBy_id(id);
 		ArrayList<Produto> produtosComPreco = this.produtoService.getProdutosComPreco(lista);
 		

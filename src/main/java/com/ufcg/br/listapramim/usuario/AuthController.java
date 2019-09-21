@@ -1,10 +1,5 @@
 package com.ufcg.br.listapramim.usuario;
 
-import static org.springframework.http.ResponseEntity.ok;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -35,32 +30,25 @@ public class AuthController {
     @Autowired
     private CustomUserDetailsService userService;
 
-    @SuppressWarnings("rawtypes")
-    @PostMapping("/login")
-    public ResponseEntity login(@RequestBody AuthBody data) {
-        try {
-            String username = data.getEmail();
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, data.getPassword()));
+	@PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody AuthBody data) {
+		try {
+			String username = data.getEmail();
+			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, data.getPassword()));
             String token = jwtTokenProvider.createToken(username, this.users.findByEmail(username).getRoles());
-            Map<Object, Object> model = new HashMap<>();
-            model.put("username", username);
-            model.put("token", token);
-            return ok(model);
+            return ResponseEntity.ok(token);
         } catch (AuthenticationException e) {
             throw new BadCredentialsException("Invalid email/password supplied");
         }
     }
 
-    @SuppressWarnings("rawtypes")
-    @PostMapping("/register")
-    public ResponseEntity register(@RequestBody Users user) {
+	@PostMapping("/register")
+    public ResponseEntity<Users> register(@RequestBody Users user) {
         Users userExists = userService.findUserByEmail(user.getEmail());
         if (userExists != null) {
             throw new BadCredentialsException("User with username: " + user.getEmail() + " already exists");
         }
-        userService.saveUser(user);
-        Map<Object, Object> model = new HashMap<>();
-        model.put("message", "User registered successfully");
-        return ok(model);
+        Users useradd = userService.saveUser(user);
+        return ResponseEntity.ok(useradd);
     }
 }

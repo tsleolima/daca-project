@@ -8,7 +8,12 @@ import javax.validation.constraints.NotEmpty;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.ufcg.br.listapramim.usuario.Users;
+
+@Document(collection="listacompra")
 public class ListaDeCompra {
 
 	@Id
@@ -20,6 +25,9 @@ public class ListaDeCompra {
 	private double valorFinal;
 	
 	private String localCompra;
+	
+	@DBRef
+	private Users user;
 	
 	private ArrayList<Compra> compras;
 	
@@ -71,6 +79,13 @@ public class ListaDeCompra {
 		this.localCompra = localCompra;
 	}
 
+	public Users getUser() {
+		return user;
+	}
+
+	public void setUser(Users user) {
+		this.user = user;
+	}
 
 	@Override
 	public int hashCode() {

@@ -29,7 +29,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-
 	    Users user = userRepository.findByEmail(email);
 	    if(user != null) {
 	        List<GrantedAuthority> authorities = getUserAuthority(user.getRoles());
@@ -43,11 +42,11 @@ public class CustomUserDetailsService implements UserDetailsService {
 	    return userRepository.findByEmail(email);
 	}
 	
-	public void saveUser(Users user) {
+	public Users saveUser(Users user) {
 	    user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
 	    Role userRole = roleRepository.findByRole("ADMIN");
 	    user.setRoles(new HashSet<>(Arrays.asList(userRole)));
-	    userRepository.save(user);
+	    return userRepository.save(user);
 	}
 	
 	private List<GrantedAuthority> getUserAuthority(Set<Role> userRoles) {
@@ -62,5 +61,9 @@ public class CustomUserDetailsService implements UserDetailsService {
 	
 	private UserDetails buildUserForAuthentication(Users user, List<GrantedAuthority> authorities) {
 	    return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
+	}
+
+	public int numeroUsers() {
+		return userRepository.findAll().size();
 	}
 }
