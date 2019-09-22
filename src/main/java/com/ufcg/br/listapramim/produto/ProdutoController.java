@@ -41,8 +41,9 @@ public class ProdutoController {
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<Produto> getProduto(@PathVariable ObjectId id) {
-		Produto produto = this.produtoService.getProduto(id);
+	public ResponseEntity<Produto> getProduto(HttpServletRequest request,@PathVariable ObjectId id) {
+		Users user = (Users) request.getAttribute("user");
+		Produto produto = this.produtoService.getProduto(user,id);
 		if(produto != null) {
 			return ResponseEntity.ok().body(produto);
 		}
@@ -104,8 +105,9 @@ public class ProdutoController {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<Produto> atualizarProduto (@PathVariable ObjectId id, @RequestBody Produto produtoAtt) {
-		Produto produto = this.produtoService.atualizarProduto(id,produtoAtt);
+	public ResponseEntity<Produto> atualizarProduto (HttpServletRequest request,@PathVariable ObjectId id, @RequestBody Produto produtoAtt) {
+		Users user = (Users) request.getAttribute("user");
+		Produto produto = this.produtoService.atualizarProduto(user,id,produtoAtt);
 		if(produto != null) {
 			return ResponseEntity.ok().body(produto);
 		} else {
@@ -114,8 +116,9 @@ public class ProdutoController {
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<?> deletarProduto (@PathVariable ObjectId id) {
-		Produto produto = this.produtoService.deletarProduto(id);
+	public ResponseEntity<?> deletarProduto (HttpServletRequest request,@PathVariable ObjectId id) {
+		Users user = (Users) request.getAttribute("user");
+		Produto produto = this.produtoService.deletarProduto(user,id);
 		if(produto != null) {
 			return ResponseEntity.ok().build();
 		} else {

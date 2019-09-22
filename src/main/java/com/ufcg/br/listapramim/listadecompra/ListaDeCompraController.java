@@ -40,8 +40,9 @@ public class ListaDeCompraController {
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<ListaDeCompra> getListaCompra(@PathVariable ObjectId id){
-		ListaDeCompra lista = this.listaDeCompraService.getListaCompra(id);
+	public ResponseEntity<ListaDeCompra> getListaCompra(HttpServletRequest request,@PathVariable ObjectId id){
+		Users user = (Users) request.getAttribute("user");
+		ListaDeCompra lista = this.listaDeCompraService.getListaCompra(user,id);
 		if(lista != null) {
 			return ResponseEntity.ok().body(lista);
 		} else {
@@ -64,8 +65,9 @@ public class ListaDeCompraController {
 	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<ListaDeCompra> atualizarLista(@PathVariable ObjectId id, @RequestBody ListaDeCompra listaAtt){
-		ListaDeCompra lista = this.listaDeCompraService.atualizarLista(id, listaAtt);
+	public ResponseEntity<ListaDeCompra> atualizarLista(HttpServletRequest request ,@PathVariable ObjectId id, @RequestBody ListaDeCompra listaAtt){
+		Users user = (Users) request.getAttribute("user");
+		ListaDeCompra lista = this.listaDeCompraService.atualizarLista(user, id, listaAtt);
 		if(lista != null) {
 			return ResponseEntity.ok().body(lista);
 		}
@@ -73,8 +75,9 @@ public class ListaDeCompraController {
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<?> removerLista(@PathVariable ObjectId id) {
-		ListaDeCompra lista = this.listaDeCompraService.removerLista(id);
+	public ResponseEntity<?> removerLista(HttpServletRequest request ,@PathVariable ObjectId id) {
+		Users user = (Users) request.getAttribute("user");
+		ListaDeCompra lista = this.listaDeCompraService.removerLista(user,id);
 		if(lista != null) {
 			return ResponseEntity.ok().build();
 		}
@@ -88,13 +91,13 @@ public class ListaDeCompraController {
 		return ResponseEntity.ok().body(this.listaDeCompraService.findProdutoByDescritor(listasUser, descritor));
 	}
 	
-	@GetMapping("/search/data/{data}") // dd-mm-yyyy
+	@GetMapping("/search/data/{data}") // yyyy-mm-dd
 	public ResponseEntity<ArrayList<ListaDeCompra>> buscarListaData(HttpServletRequest request,@PathVariable String data){
 		Users user = (Users) request.getAttribute("user");
 		return ResponseEntity.ok().body(this.listaDeCompraService.buscarListaData(user,data));
 	}
 	
-	@GetMapping("/search/idproduto/{idProduto}")
+	@GetMapping("/search/produto/{idProduto}")
 	public ResponseEntity<ArrayList<ListaDeCompra>> buscarListaProduto(HttpServletRequest request,@PathVariable ObjectId idProduto){
 		Users user = (Users) request.getAttribute("user");
 		return ResponseEntity.ok().body(this.listaDeCompraService.buscarListaProduto(user,idProduto));

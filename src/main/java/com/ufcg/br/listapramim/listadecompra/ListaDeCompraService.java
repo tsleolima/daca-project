@@ -55,15 +55,15 @@ public class ListaDeCompraService {
 	public ListaDeCompra findProdutoByDescritor(ArrayList<ListaDeCompra> listasUser, String descritor) {
 		ListaDeCompra lista = null;
 		for (ListaDeCompra listaDeCompra : listasUser) {
-			if(listaDeCompra.getDescritor().equals(descritor)){
+			if(listaDeCompra.getDescritor().toLowerCase().equals(descritor.toLowerCase())){
 				lista = listaDeCompra;
 			}
 		}
 		return lista;
 	}
 
-	public ListaDeCompra atualizarLista(ObjectId id, ListaDeCompra lista) {
-		ListaDeCompra listaBuscada = this.listaDeCompraRepository.findListaBy_id(id);
+	public ListaDeCompra atualizarLista(Users user, ObjectId id, ListaDeCompra lista) {
+		ListaDeCompra listaBuscada = findListaBy_id(user, id);
 		if(listaBuscada != null) {
 			listaBuscada.setCompras(lista.getCompras());
 			listaBuscada.setDescritor(lista.getDescritor());
@@ -75,17 +75,19 @@ public class ListaDeCompraService {
 		
 	}
 
-	public ListaDeCompra removerLista(ObjectId id) {
-		ListaDeCompra lista = this.listaDeCompraRepository.findListaBy_id(id);
+	public ListaDeCompra removerLista(Users user,ObjectId id) {
+		ListaDeCompra lista = findListaBy_id(user, id);
 		if(lista != null) this.listaDeCompraRepository.delete(lista);
 		return lista;
 	}
 	
 	
 
-	public ListaDeCompra getListaCompra(ObjectId id) {
-		ListaDeCompra listaBuscada = this.listaDeCompraRepository.findListaBy_id(id);		
+	public ListaDeCompra getListaCompra(Users user,ObjectId id) {
+		
+		ListaDeCompra listaBuscada = findListaBy_id(user,id);		
 		ArrayList<Compra> comprasOrdenadas = new ArrayList<Compra>();
+		
 		comprasOrdenadas.addAll(produtosHigienePessoal(listaBuscada.getCompras()));
 		comprasOrdenadas.addAll(produtosLimpeza(listaBuscada.getCompras()));
 		comprasOrdenadas.addAll(produtosIndustrializados(listaBuscada.getCompras()));
@@ -95,6 +97,16 @@ public class ListaDeCompraService {
 		return listaBuscada;
 	}
 	
+	private ListaDeCompra findListaBy_id(Users user,ObjectId id) {
+		ArrayList<ListaDeCompra> listasUser = (ArrayList<ListaDeCompra>) getListas(user);
+		for (ListaDeCompra lista: listasUser) {
+			if(lista.get_id().equals(id) && lista.getUser().getId().equals(user.getId())) {
+				return lista;
+			}
+		}	
+		return null;
+	}
+
 	public ArrayList<Compra> produtosIndustrializados(ArrayList<Compra> compras) {
 		return this.produtoService.produtosIndustrializados(compras);
 	}
@@ -221,7 +233,7 @@ public class ListaDeCompraService {
 
 	public ArrayList<SugestaoDAO> sugerirLocalDeCompra(Users user,ObjectId id) {
 		ListaDeCompra lista = this.listaDeCompraRepository.findListaBy_id(id);
-		ArrayList<Produto> produtosComPreco = this.produtoService.getProdutosComPreco(lista);
+		ArrayList<Produto> produtosComPreco = this.produtoService.getProdutosComPreco(user,lista);
 		
 		ArrayList<SugestaoDAO> sugestoes = new ArrayList<SugestaoDAO>();
 		

@@ -32,8 +32,14 @@ public class ProdutoService {
 		return produtosUser;
 	}
 	
-	public Produto getProduto(ObjectId id) {
-		return this.produtoRepository.findProdutoBy_id(id);
+	public Produto getProduto(Users user,ObjectId id) {
+		ArrayList<Produto> produtosUser = (ArrayList<Produto>) getProdutos(user);
+		for (Produto produto : produtosUser) {
+			if(produto.getId().equals(id) && produto.getUser().getId().equals(user.getId())) {
+				return produto;
+			}
+		}	
+		return null;
 	}	
 
 	public ArrayList<Produto> getProdutosOrdenados(Users user) {
@@ -71,8 +77,6 @@ public class ProdutoService {
 			
 			if (produto.getQuantidade() != null) updated = new Produto(produto.getNome(),produto.getCategoria(),produto.getTipo(),produto.getQuantidade());
 			else updated = new Produto(produto.getNome(),produto.getCategoria(),produto.getTipo());
-			
-			System.out.println(user.getId().toString());
 			updated.setUser(user);
 			return this.produtoRepository.save(updated);
 			
@@ -90,8 +94,8 @@ public class ProdutoService {
 		return produtofinal;
 	}
 
-	public Produto atualizarProduto(ObjectId id, Produto produto) {
-		Produto produtoBuscado = this.produtoRepository.findProdutoBy_id(id);
+	public Produto atualizarProduto(Users user,ObjectId id, Produto produto) {
+		Produto produtoBuscado = getProduto(user, id);
 		if(produtoBuscado != null) {
 			produtoBuscado.setNome(produto.getNome());
 			produtoBuscado.setCategoria(produto.getCategoria());
@@ -104,8 +108,8 @@ public class ProdutoService {
 			return produtoBuscado;
 	}
 
-	public Produto deletarProduto(ObjectId id) {
-		Produto produto = produtoRepository.findProdutoBy_id(id);
+	public Produto deletarProduto(Users user,ObjectId id) {
+		Produto produto = getProduto(user, id);
 		if(produto != null) produtoRepository.delete(produto);
 		return produto;
 				
@@ -162,10 +166,10 @@ public class ProdutoService {
 		return comprasCategoriaSelecionada;
 	}
 
-	public ArrayList<Produto> getProdutosComPreco(ListaDeCompra lista) {
+	public ArrayList<Produto> getProdutosComPreco(Users user,ListaDeCompra lista) {
 		ArrayList<Produto> produtos = new ArrayList<Produto>();
 		for (Compra compra : lista.getCompras()) {
-			Produto produto = this.getProduto(compra.getIdProduto());
+			Produto produto = this.getProduto(user,compra.getIdProduto());
 			if(produto.getMapaDePrecos() != null) {
 				produtos.add(produto);
 			}
