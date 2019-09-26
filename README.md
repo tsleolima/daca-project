@@ -74,9 +74,9 @@ Para produtos com `INDUS_UNI` temos produtos que são industrializados e não se
 | GET dos produtos cadastrados | https://listapramim-api.herokuapp.com/produto |
 | GET em um produto especifico com seu id | https://listapramim-api.herokuapp.com/produto/{id} |
 | GET com produtos ordenados por nome | https://listapramim-api.herokuapp.com/produto/ordered |
-| GET com produtos ordenados por uma categoria | https://listapramim-api.herokuapp.com/produto/ordered/{categoria} |
+| GET com produtos ordenados por uma categoria | https://listapramim-api.herokuapp.com/produto/ordered/by?categoria={categoria} |
 | GET com produtos ordenados pelo preço | https://listapramim-api.herokuapp.com/produto/ordered/preco |
-| GET com produtos que possuem um determinado nome |https://listapramim-api.herokuapp.com/produto/search/{nome} |
+| GET com produtos que possuem um determinado nome |https://listapramim-api.herokuapp.com/produto/search?nome={nome} |
 | POST do produto a ser adicionado | https://listapramim-api.herokuapp.com/produto/ |
 | PUT do produto inserindo seu id de busca e seu objeto atualizado | https://listapramim-api.herokuapp.com/produto/{id} |
 | DELETE do produto já cadastrado | https://listapramim-api.herokuapp.com/produto/{id} |

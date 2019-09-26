@@ -119,11 +119,8 @@ public class ProdutoService {
 		ArrayList<Produto> produtos = (ArrayList<Produto>) getProdutos(user);
 		ArrayList<Produto> saida = new ArrayList<Produto>();
 		for (Produto produto : produtos) {
-			String[] palavrasProduto = produto.getNome().split(" ");
-			for (String palavra : palavrasProduto) {
-				if(palavra.toLowerCase().equals(nome.toLowerCase())) {
-					saida.add(produto);
-				}
+			if(produto.getNome().toLowerCase().contains(nome.toLowerCase())) {
+				saida.add(produto);
 			}
 		}
 		

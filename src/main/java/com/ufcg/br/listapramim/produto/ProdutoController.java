@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.ufcg.br.listapramim.usuario.Users;
 
@@ -61,8 +62,8 @@ public class ProdutoController {
 		}
 	}
 	
-	@GetMapping("/ordered/{categoria}")
-	public ResponseEntity<ArrayList<Produto>> getProdutosOrdenadosCategoria(HttpServletRequest request, @PathVariable String categoria){
+	@GetMapping("/ordered/by")
+	public ResponseEntity<ArrayList<Produto>> getProdutosOrdenadosCategoria(HttpServletRequest request, @RequestParam String categoria){
 		Users user = (Users) request.getAttribute("user");
 		ArrayList<Produto> produtos = this.produtoService.getProdutosOrdenadosCategoria(user,categoria);
 		if(produtos.size() > 0) {
@@ -72,7 +73,7 @@ public class ProdutoController {
 		}
 	}
 	
-	@GetMapping("/ordered/preco")
+	@GetMapping("/ordered/by/preco")
 	public ResponseEntity<ArrayList<ItemVenda>> getProdutosOrdenadosPreco(HttpServletRequest request){
 		Users user = (Users) request.getAttribute("user");
 		ArrayList<ItemVenda> itensVenda = this.produtoService.getProdutosOrdenadosPreco(user);
@@ -83,8 +84,9 @@ public class ProdutoController {
 		}
 	}
 	
-	@GetMapping("/search/{nome}")
-	public ResponseEntity<ArrayList<Produto>> pesquisaProdutoNome(HttpServletRequest request, @PathVariable String nome){
+	@GetMapping("/search")
+	public ResponseEntity<ArrayList<Produto>> pesquisaProdutoNome(HttpServletRequest request, @RequestParam String nome){
+		System.out.println(nome);
 		Users user = (Users) request.getAttribute("user");
 		ArrayList<Produto> produtos = this.produtoService.pesquisaProdutoNome(user,nome);
 		if(produtos.size() > 0) {
