@@ -98,9 +98,13 @@ Para produtos com `INDUS_UNI` temos produtos que são industrializados e não se
 
 # Usuário
 
-O sistema inclui autorização e autenticação de usuários, nele cada cliente pode realizar seu cadastro e seu login e desfrutar das funcionalidades individualmente.
+O sistema inclui autorização e autenticação de usuários, nele cada cliente pode realizar seu cadastro e seu login e desfrutar das funcionalidades individualmente, ou seja os produtos e listas de compras de uma pessoa não é vista e nem acessada por outra, por exemplo: Joãozinho não pode dar delete no produto de Mariazinha
 
-A segurança é feita utilizando JWT (Json Web Token), ou seja, a cada login realizado com sucesso o sistema irá retornar um token válido durante 1 hora para o usuário. Toda a implementação foi feita a partir do SpringSecurity seguindo como referência [o site](https://www.djamware.com/post/5c819d0180aca754f7a9d1ee/securing-restful-api-with-spring-boot-security-and-data-mongodb "o site") leves alterações foram precisas para atender as reais necessidades do projeto.
+A segurança é feita utilizando JWT (Json Web Token), ou seja, a cada login realizado com sucesso o sistema irá retornar um token válido durante 1 hora para o usuário. Todas as requisiçôes realizadas exceto o POST para login e cadastro são bloqueadas respondendo um STATUS 401, o token dado em resposta ao login realizado deve ser utilizado no campo Authorization no Header para que as rotas anteriormente bloqueadas sejam utilizadas.
+
+A senha do usuário é criptografada com o bCryptPasswordEncoder assim que o mesmo realiza o seu registro no sistema.
+
+Um filtro é usado em cada requisição para garantir que as rotas sejam acessadas ou bloqueadas. Para serem acessadas, o token  é validado e o usuário é recuperado a partir do token e adicionado na requisição para ser utilizado no controller. 
 
 O sistema também está implementado com roles, por default todo usuário inicialmente é ADMIN, caso o sistema evolua e seja necessária a distinção entre usuários, será realizado modificações em cima dessa implementação base.
 
