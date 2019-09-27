@@ -7,8 +7,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -65,5 +67,11 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 	public int numeroUsers() {
 		return userRepository.findAll().size();
+	}
+
+	public Users getUserCurrent() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		System.out.println(authentication.getName());
+		return this.userRepository.findByEmail(authentication.getName());
 	}
 }

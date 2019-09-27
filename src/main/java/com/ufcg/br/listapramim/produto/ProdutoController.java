@@ -2,9 +2,6 @@ package com.ufcg.br.listapramim.produto;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,18 +15,23 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.ufcg.br.listapramim.usuario.CustomUserDetailsService;
 import com.ufcg.br.listapramim.usuario.Users;
 
 @RestController
 @RequestMapping({"/api/produto"})
 public class ProdutoController {
-
+	
+	@Autowired
+	private CustomUserDetailsService userService;
+	
 	@Autowired
 	private ProdutoService produtoService;
 	
 	@GetMapping
-	public ResponseEntity<List<Produto>> getProdutos(HttpServletRequest request){
-		Users user = (Users) request.getAttribute("user");
+	public ResponseEntity<List<Produto>> getProdutos(){
+		Users user = userService.getUserCurrent();
 		List<Produto> produtos = this.produtoService.getProdutos(user);
 		if(produtos.isEmpty()) {
 			return ResponseEntity.noContent().build();
@@ -42,8 +44,8 @@ public class ProdutoController {
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<Produto> getProduto(HttpServletRequest request,@PathVariable ObjectId id) {
-		Users user = (Users) request.getAttribute("user");
+	public ResponseEntity<Produto> getProduto(@PathVariable ObjectId id) {
+		Users user = userService.getUserCurrent();
 		Produto produto = this.produtoService.getProduto(user,id);
 		if(produto != null) {
 			return ResponseEntity.ok().body(produto);
@@ -52,8 +54,8 @@ public class ProdutoController {
 	}
 	
 	@GetMapping("/ordered")
-	public ResponseEntity<ArrayList<Produto>> getProdutosOrdenados(HttpServletRequest request){
-		Users user = (Users) request.getAttribute("user");
+	public ResponseEntity<ArrayList<Produto>> getProdutosOrdenados(){
+		Users user = userService.getUserCurrent();
 		ArrayList<Produto> produtos = this.produtoService.getProdutosOrdenados(user);
 		if(produtos.size() > 0) {
 			return ResponseEntity.ok().body(produtos);
@@ -63,8 +65,8 @@ public class ProdutoController {
 	}
 	
 	@GetMapping("/ordered/by")
-	public ResponseEntity<ArrayList<Produto>> getProdutosOrdenadosCategoria(HttpServletRequest request, @RequestParam String categoria){
-		Users user = (Users) request.getAttribute("user");
+	public ResponseEntity<ArrayList<Produto>> getProdutosOrdenadosCategoria(@RequestParam String categoria){
+		Users user = userService.getUserCurrent();
 		ArrayList<Produto> produtos = this.produtoService.getProdutosOrdenadosCategoria(user,categoria);
 		if(produtos.size() > 0) {
 			return ResponseEntity.ok().body(produtos);
@@ -74,8 +76,8 @@ public class ProdutoController {
 	}
 	
 	@GetMapping("/ordered/by/preco")
-	public ResponseEntity<ArrayList<ItemVenda>> getProdutosOrdenadosPreco(HttpServletRequest request){
-		Users user = (Users) request.getAttribute("user");
+	public ResponseEntity<ArrayList<ItemVenda>> getProdutosOrdenadosPreco(){
+		Users user = userService.getUserCurrent();
 		ArrayList<ItemVenda> itensVenda = this.produtoService.getProdutosOrdenadosPreco(user);
 		if(itensVenda.size() > 0) {
 			return ResponseEntity.ok().body(itensVenda);
@@ -85,9 +87,8 @@ public class ProdutoController {
 	}
 	
 	@GetMapping("/search")
-	public ResponseEntity<ArrayList<Produto>> pesquisaProdutoNome(HttpServletRequest request, @RequestParam String nome){
-		System.out.println(nome);
-		Users user = (Users) request.getAttribute("user");
+	public ResponseEntity<ArrayList<Produto>> pesquisaProdutoNome(@RequestParam String nome){
+		Users user = userService.getUserCurrent();
 		ArrayList<Produto> produtos = this.produtoService.pesquisaProdutoNome(user,nome);
 		if(produtos.size() > 0) {
 			return ResponseEntity.ok().body(produtos);
@@ -97,8 +98,8 @@ public class ProdutoController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<Produto> cadastrarProduto(HttpServletRequest request,@RequestBody ProdutoDAO produtoAdd) {
-		Users user = (Users) request.getAttribute("user");
+	public ResponseEntity<Produto> cadastrarProduto(@RequestBody ProdutoDAO produtoAdd) {
+		Users user = userService.getUserCurrent();
 		Produto produto = this.produtoService.cadastrarProduto(user,produtoAdd);
 		if(produto != null) {
 			return ResponseEntity.ok().body(produto);
@@ -107,8 +108,8 @@ public class ProdutoController {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<Produto> atualizarProduto (HttpServletRequest request,@PathVariable ObjectId id, @RequestBody Produto produtoAtt) {
-		Users user = (Users) request.getAttribute("user");
+	public ResponseEntity<Produto> atualizarProduto (@PathVariable ObjectId id, @RequestBody Produto produtoAtt) {
+		Users user = userService.getUserCurrent();
 		Produto produto = this.produtoService.atualizarProduto(user,id,produtoAtt);
 		if(produto != null) {
 			return ResponseEntity.ok().body(produto);
@@ -118,8 +119,8 @@ public class ProdutoController {
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<?> deletarProduto (HttpServletRequest request,@PathVariable ObjectId id) {
-		Users user = (Users) request.getAttribute("user");
+	public ResponseEntity<?> deletarProduto (@PathVariable ObjectId id) {
+		Users user = userService.getUserCurrent();
 		Produto produto = this.produtoService.deletarProduto(user,id);
 		if(produto != null) {
 			return ResponseEntity.ok().build();

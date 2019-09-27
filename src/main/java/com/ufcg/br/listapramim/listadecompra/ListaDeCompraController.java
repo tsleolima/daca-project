@@ -3,7 +3,6 @@ package com.ufcg.br.listapramim.listadecompra;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import org.bson.types.ObjectId;
@@ -19,18 +18,22 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ufcg.br.listapramim.usuario.CustomUserDetailsService;
 import com.ufcg.br.listapramim.usuario.Users;
 
 @RestController
 @RequestMapping({"/api/listacompra"})
 public class ListaDeCompraController {
-
+	
+	@Autowired
+	private CustomUserDetailsService userService;
+	
 	@Autowired
 	private ListaDeCompraService listaDeCompraService;
 	
 	@GetMapping
-	public ResponseEntity<List<ListaDeCompra>> getListas(HttpServletRequest request){
-		Users user = (Users) request.getAttribute("user");
+	public ResponseEntity<List<ListaDeCompra>> getListas(){
+		Users user = userService.getUserCurrent();
 		List<ListaDeCompra> listas = listaDeCompraService.getListas(user);
 		if(listas.size() > 0) {
 			return ResponseEntity.ok().body(listas);
@@ -40,8 +43,8 @@ public class ListaDeCompraController {
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<ListaDeCompra> getListaCompra(HttpServletRequest request,@PathVariable ObjectId id){
-		Users user = (Users) request.getAttribute("user");
+	public ResponseEntity<ListaDeCompra> getListaCompra(@PathVariable ObjectId id){
+		Users user = userService.getUserCurrent();
 		ListaDeCompra lista = this.listaDeCompraService.getListaCompra(user,id);
 		if(lista != null) {
 			return ResponseEntity.ok().body(lista);
@@ -51,8 +54,8 @@ public class ListaDeCompraController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<ListaDeCompra> cadastrarLista (HttpServletRequest request ,@RequestBody ListaDeCompra listaAdd) {
-		Users user = (Users) request.getAttribute("user");
+	public ResponseEntity<ListaDeCompra> cadastrarLista (@RequestBody ListaDeCompra listaAdd) {
+		Users user = userService.getUserCurrent();
 		Set<ConstraintViolation<ListaDeCompra>> validate = Validation.buildDefaultValidatorFactory().getValidator().validate(listaAdd);
 		if (!validate.isEmpty()) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -65,8 +68,8 @@ public class ListaDeCompraController {
 	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<ListaDeCompra> atualizarLista(HttpServletRequest request ,@PathVariable ObjectId id, @RequestBody ListaDeCompra listaAtt){
-		Users user = (Users) request.getAttribute("user");
+	public ResponseEntity<ListaDeCompra> atualizarLista(@PathVariable ObjectId id, @RequestBody ListaDeCompra listaAtt){
+		Users user = userService.getUserCurrent();
 		ListaDeCompra lista = this.listaDeCompraService.atualizarLista(user, id, listaAtt);
 		if(lista != null) {
 			return ResponseEntity.ok().body(lista);
@@ -75,8 +78,8 @@ public class ListaDeCompraController {
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<?> removerLista(HttpServletRequest request ,@PathVariable ObjectId id) {
-		Users user = (Users) request.getAttribute("user");
+	public ResponseEntity<?> removerLista(@PathVariable ObjectId id) {
+		Users user = userService.getUserCurrent();
 		ListaDeCompra lista = this.listaDeCompraService.removerLista(user,id);
 		if(lista != null) {
 			return ResponseEntity.ok().build();
@@ -85,51 +88,51 @@ public class ListaDeCompraController {
 	}
 	
 	@GetMapping("/search/descritor/{descritor}")
-	public ResponseEntity<ListaDeCompra> buscarListaDescritor(HttpServletRequest request,@PathVariable String descritor){
-		Users user = (Users) request.getAttribute("user");
+	public ResponseEntity<ListaDeCompra> buscarListaDescritor(@PathVariable String descritor){
+		Users user = userService.getUserCurrent();
 		ArrayList<ListaDeCompra> listasUser = (ArrayList<ListaDeCompra>) this.listaDeCompraService.getListas(user);
 		return ResponseEntity.ok().body(this.listaDeCompraService.findProdutoByDescritor(listasUser, descritor));
 	}
 	
 	@GetMapping("/search/data/{data}") // yyyy-mm-dd
-	public ResponseEntity<ArrayList<ListaDeCompra>> buscarListaData(HttpServletRequest request,@PathVariable String data){
-		Users user = (Users) request.getAttribute("user");
+	public ResponseEntity<ArrayList<ListaDeCompra>> buscarListaData(@PathVariable String data){
+		Users user = userService.getUserCurrent();
 		return ResponseEntity.ok().body(this.listaDeCompraService.buscarListaData(user,data));
 	}
 	
 	@GetMapping("/search/produto/{idProduto}")
-	public ResponseEntity<ArrayList<ListaDeCompra>> buscarListaProduto(HttpServletRequest request,@PathVariable ObjectId idProduto){
-		Users user = (Users) request.getAttribute("user");
+	public ResponseEntity<ArrayList<ListaDeCompra>> buscarListaProduto(@PathVariable ObjectId idProduto){
+		Users user = userService.getUserCurrent();
 		return ResponseEntity.ok().body(this.listaDeCompraService.buscarListaProduto(user,idProduto));
 	}
 	
 	@GetMapping("/automatic/recent")
-	public ResponseEntity<ListaDeCompra> gerarUltimaListaFinalizada(HttpServletRequest request){
-		Users user = (Users) request.getAttribute("user");
+	public ResponseEntity<ListaDeCompra> gerarUltimaListaFinalizada(){
+		Users user = userService.getUserCurrent();
 		ListaDeCompra lista = this.listaDeCompraService.gerarUltimaListaFinalizada(user);
 		if(lista != null) return ResponseEntity.ok().body(lista);
 		return ResponseEntity.noContent().build();
 	}
 	
 	@GetMapping("/automatic/itemcompra/{idProduto}")
-	public ResponseEntity<ListaDeCompra> gerarListaItemCompra(HttpServletRequest request,@PathVariable ObjectId idProduto){
-		Users user = (Users) request.getAttribute("user");
+	public ResponseEntity<ListaDeCompra> gerarListaItemCompra(@PathVariable ObjectId idProduto){
+		Users user = userService.getUserCurrent();
 		ListaDeCompra lista = this.listaDeCompraService.gerarListaItemCompra(user,idProduto);
 		if(lista != null) return ResponseEntity.ok().body(lista);
 		return ResponseEntity.noContent().build();
 	}
 	
 	@GetMapping("/automatic/maisfrequentes")
-	public ResponseEntity<ListaDeCompra> gerarListaProdutosMaisFrequentes(HttpServletRequest request){
-		Users user = (Users) request.getAttribute("user");
+	public ResponseEntity<ListaDeCompra> gerarListaProdutosMaisFrequentes(){
+		Users user = userService.getUserCurrent();
 		ListaDeCompra lista = this.listaDeCompraService.gerarListaProdutosMaisFrequentes(user);
 		if(lista != null) return ResponseEntity.ok().body(lista);
 		return ResponseEntity.noContent().build();
 	}
 	
 	@GetMapping("/suggestion/{id}")
-	public ResponseEntity<ArrayList<SugestaoDAO>> sugerirLocalDeCompra(HttpServletRequest request,@PathVariable ObjectId id){
-		Users user = (Users) request.getAttribute("user");
+	public ResponseEntity<ArrayList<SugestaoDAO>> sugerirLocalDeCompra(@PathVariable ObjectId id){
+		Users user = userService.getUserCurrent();
 		ArrayList<SugestaoDAO> sugestoes = this.listaDeCompraService.sugerirLocalDeCompra(user,id);
 		if(sugestoes != null) return ResponseEntity.ok().body(sugestoes);
 		return ResponseEntity.noContent().build();
