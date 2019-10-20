@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,7 +32,9 @@ public class ProdutoController {
 	private ProdutoService produtoService;
 	
 	@GetMapping
+	@Cacheable("produtos")
 	public ResponseEntity<List<Produto>> getProdutos(){
+        simulateSlowService();
 		Users user = userService.getUserCurrent();
 		List<Produto> produtos = this.produtoService.getProdutos(user);
 		if(produtos.isEmpty()) {
@@ -43,6 +47,15 @@ public class ProdutoController {
 		}
 	}
 	
+	private void simulateSlowService() {
+        try {
+            long time = 500L;
+            Thread.sleep(time);
+        } catch (InterruptedException e) {
+            throw new IllegalStateException(e);
+        }		
+	}
+
 	@GetMapping("/{id}")
 	public ResponseEntity<Produto> getProduto(@PathVariable ObjectId id) {
 		Users user = userService.getUserCurrent();
@@ -98,6 +111,7 @@ public class ProdutoController {
 	}
 	
 	@PostMapping
+	@CacheEvict(value="produtos", allEntries = true) 
 	public ResponseEntity<Produto> cadastrarProduto(@RequestBody ProdutoDAO produtoAdd) {
 		Users user = userService.getUserCurrent();
 		Produto produto = this.produtoService.cadastrarProduto(user,produtoAdd);

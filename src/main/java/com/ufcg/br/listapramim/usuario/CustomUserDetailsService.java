@@ -71,7 +71,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 	public Users getUserCurrent() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		System.out.println(authentication.getName());
 		return this.userRepository.findByEmail(authentication.getName());
 	}
 }

@@ -7,6 +7,8 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,7 +34,9 @@ public class ListaDeCompraController {
 	private ListaDeCompraService listaDeCompraService;
 	
 	@GetMapping
+	@Cacheable("listas")
 	public ResponseEntity<List<ListaDeCompra>> getListas(){
+        simulateSlowService();
 		Users user = userService.getUserCurrent();
 		List<ListaDeCompra> listas = listaDeCompraService.getListas(user);
 		if(listas.size() > 0) {
@@ -40,6 +44,15 @@ public class ListaDeCompraController {
 		} else {
 			return ResponseEntity.noContent().build();
 		}
+	}
+	
+	private void simulateSlowService() {
+        try {
+            long time = 500L;
+            Thread.sleep(time);
+        } catch (InterruptedException e) {
+            throw new IllegalStateException(e);
+        }		
 	}
 	
 	@GetMapping("/{id}")
@@ -54,6 +67,7 @@ public class ListaDeCompraController {
 	}
 	
 	@PostMapping
+	@CacheEvict(value="listas", allEntries = true) 
 	public ResponseEntity<ListaDeCompra> cadastrarLista (@RequestBody ListaDeCompra listaAdd) {
 		Users user = userService.getUserCurrent();
 		Set<ConstraintViolation<ListaDeCompra>> validate = Validation.buildDefaultValidatorFactory().getValidator().validate(listaAdd);

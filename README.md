@@ -100,13 +100,19 @@ Para produtos com `INDUS_UNI` temos produtos que são industrializados e não se
 
 O sistema inclui autorização e autenticação de usuários, nele cada cliente pode realizar seu cadastro e seu login e desfrutar das funcionalidades individualmente, ou seja os produtos e listas de compras de uma pessoa não é vista e nem acessada por outra, por exemplo: Joãozinho não pode dar delete no produto de Mariazinha
 
-A segurança é feita utilizando JWT (Json Web Token), ou seja, a cada login realizado com sucesso o sistema irá retornar um token válido durante 1 hora para o usuário. Todas as requisiçôes realizadas exceto o POST para login e cadastro são bloqueadas respondendo um STATUS 401, o token dado em resposta ao login realizado deve ser utilizado no campo Authorization no Header para que as rotas anteriormente bloqueadas sejam utilizadas.
+A segurança é feita utilizando JWT (Json Web Token), ou seja, a cada login realizado com sucesso o sistema irá retornar um token válido durante 1 hora para o usuário, podendo ser modificado acessando a classe *JwtTokenProvider*. Todas as requisiçôes realizadas exceto o POST para login e cadastro são bloqueadas respondendo um STATUS 401, o token dado em resposta ao login realizado deve ser utilizado no campo *Authorization* no Header para que as rotas anteriormente bloqueadas sejam utilizadas.
 
 A senha do usuário é criptografada com o bCryptPasswordEncoder assim que o mesmo realiza o seu registro no sistema.
 
-Um filtro é usado em cada requisição para garantir que as rotas sejam acessadas ou bloqueadas. Para serem acessadas, o token  é validado e o usuário é recuperado a partir do token e adicionado na requisição para ser utilizado no controller. 
+Um filtro é usado em cada requisição para garantir que as rotas sejam acessadas ou bloqueadas. Para serem acessadas, o token  é validado e o usuário é recuperado a partir do token e adicionado no contexto de segurança da aplicação através do método *SecurityContextHolder.getContext().setAuthentication(auth)*
 
 O sistema também está implementado com roles, por default todo usuário inicialmente é ADMIN, caso o sistema evolua e seja necessária a distinção entre usuários, será realizado modificações em cima dessa implementação base.
+
+###Gráfico que mostra o fluxo de autenticação
+
+![](https://raw.githubusercontent.com/tsleolima/daca-project/master/assets/autenticacao.jpg)
+
+###Rotas para você realizar cadastro e login no sistema 
 
 
 | Funcionalidade de usuario | EndPoint |
@@ -114,6 +120,6 @@ O sistema também está implementado com roles, por default todo usuário inicia
 | POST para realizar cadastro | https://listapramim-api.herokuapp.com/api/auth/register |
 | POST para realizar login | https://listapramim-api.herokuapp.com/api/auth/login |
 
-### Arquitetura
+# Arquitetura
 
 ![](https://raw.githubusercontent.com/tsleolima/daca-project/master/assets/diagram.jpg)
