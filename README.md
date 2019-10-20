@@ -1,10 +1,10 @@
 # Projeto Daca 2019.2
 
-### Lista pra mim
+# Lista pra mim
 
 O Lista pra mim©, é um app que vai revolucionar a forma como você faz compras. Quanto mais você usar o Lista pra mim, mais rápido será gerar novas listas de compras. E você ainda pode economizar anotando preços e locais de compra. Depois é só deixar o Lista pra mim© indicar o melhor lugar para você fazer suas compras.
 
-### Instalação
+# Instalação
 
 **Você pode facilmente utilizar nossa URL da API https://listapramim-api.herokuapp.com** seguindo todos os endpoints desejados
 **ou** realizando todos os passos abaixo utilizando como rota o **localhost:8080**
@@ -21,7 +21,7 @@ Inicie o servidor com API REST com
 
 Utilize algum serviço para consumir a API fornecida, futuramente desenvolveremos uma GUI Web para o projeto, mas por enquanto aconselhamos o uso do [Postman](https://www.getpostman.com/)
 
-### Features
+## Features
 
 Os produtos apresentam certas características:
 
@@ -42,7 +42,7 @@ A diferença dos tipos é que proutos com `QUANTIDADE_FIXA` possuem geralmente u
 Para produtos com `NAO_INDUS_QUILO` temos produtos que na maior parte das vezes são não industrializados, ou que em sua forma de etiquetação seja baseada em quilo, como hortifruti ou produtos que seguem a mesma lógica.
 Para produtos com `INDUS_UNI` temos produtos que são industrializados e não se diferem da sua unidade de medida, apenas pela sua quantidade direta de compra, por exemplo: Sabonetes, Borrachas, Fio dental, enfim, nessa linha :)
 
-# O Lista pra mim possui funcionalidades como:
+### O Lista pra mim possui funcionalidades como:
 
 - Cadastrar produtos
   - O produto possui nome, categoria, tipo, e um set de locais de venda do produto com preços
@@ -67,7 +67,7 @@ Para produtos com `INDUS_UNI` temos produtos que são industrializados e não se
 - As listas de compras seguem essas informações
     - Descritor da lista
 
-### EndPoints
+## EndPoints
 
 | Funcionalidade de Produtos   | EndPoint               |
 | ---------------------------- | ---------------------- |
@@ -96,7 +96,7 @@ Para produtos com `INDUS_UNI` temos produtos que são industrializados e não se
 | GET gera uma lista automaticamente baseando-se nas compras mais encontradas nas listas, a regra é os produtos que contemplam pelo menos metade das listas | https://listapramim-api.herokuapp.com/listacompra/automatic/maisfrequentes |
 | GET o lista pra mim sugere os estabelicimentos, dos quais foram utilizados para atualização produtos, que possuem pelo menos um produto da lista que deseja ser comprada, mostrando um pequeno relatório de local de venda e preço final da lista caso comprada no estabelicimento proposto | https://listapramim-api.herokuapp.com/listacompra/suggestion/{idlista} |
 
-# Usuário
+## Usuário
 
 O sistema inclui autorização e autenticação de usuários, nele cada cliente pode realizar seu cadastro e seu login e desfrutar das funcionalidades individualmente, ou seja os produtos e listas de compras de uma pessoa não é vista e nem acessada por outra, por exemplo: Joãozinho não pode dar delete no produto de Mariazinha
 
@@ -108,11 +108,11 @@ Um filtro é usado em cada requisição para garantir que as rotas sejam acessad
 
 O sistema também está implementado com roles, por default todo usuário inicialmente é ADMIN, caso o sistema evolua e seja necessária a distinção entre usuários, será realizado modificações em cima dessa implementação base.
 
-###Gráfico que mostra o fluxo de autenticação
+### Gráfico que mostra o fluxo de autenticação
 
 ![](https://raw.githubusercontent.com/tsleolima/daca-project/master/assets/autenticacao.jpg)
 
-###Rotas para você realizar cadastro e login no sistema 
+### Rotas para você realizar cadastro e login no sistema 
 
 
 | Funcionalidade de usuario | EndPoint |
@@ -120,6 +120,6 @@ O sistema também está implementado com roles, por default todo usuário inicia
 | POST para realizar cadastro | https://listapramim-api.herokuapp.com/api/auth/register |
 | POST para realizar login | https://listapramim-api.herokuapp.com/api/auth/login |
 
-# Arquitetura
+## Arquitetura
 
 ![](https://raw.githubusercontent.com/tsleolima/daca-project/master/assets/diagram.jpg)
