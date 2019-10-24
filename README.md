@@ -118,8 +118,21 @@ O sistema também está implementado com roles, por default todo usuário inicia
 | Funcionalidade de usuario | EndPoint |  
 | ------------------------- | -------- |  
 | POST para realizar cadastro | https://listapramim-api.herokuapp.com/api/auth/register |  
-| POST para realizar login | https://listapramim-api.herokuapp.com/api/auth/login |  
-  
+| POST para realizar login | https://listapramim-api.herokuapp.com/api/auth/login | 
+
+## Desempenho
+
+ Os testes foram realizados utilizando a ferramenta Jmeter, no qual podemos escolher quantos usuarios realizarão requisições ao sistema em determinadas rotas de quanto em quanto tempo, para obtermos o melhor uso, e consequentemente a vazão dos dados, na máquina de desenvolvimento foram obtidos estes parâmetros:
+ - **Numeros de Usúarios:** 90
+ - **Numero de repitições por usuário:** 30
+
+O resultado obtido pode ser verificado na imagem abaixo
+![](https://raw.githubusercontent.com/tsleolima/daca-project/master/assets/desempenho.jpg)
+ 
+Para poder visualizar com maior clareza o diferencia de tempo entre as requisições foi utilizado um *Thread.sleep(500)* fazendo com que o sistema demore no mínimo 0.5s para dar uma resposta a requisição pedida 
+Pode se observar que as rotas com cache tiveram melhor êxito ao passar do tempo foram as que possuiam cache, entretanto vale observar que as rotas que possuem cache tiveram suas primeiras requisições em tempos grandes, devido ao fato da sua configuração. 
+
+Mais testes realizados com o Jmeter com diversos gráficos voce pode encontrar aqui: 
 ## Arquitetura  
   
 ![](https://raw.githubusercontent.com/tsleolima/daca-project/master/assets/diagram.jpg)
