@@ -46,6 +46,17 @@ public class ListaDeCompraController {
 		}
 	}
 	
+	@GetMapping("/semcache")
+	public ResponseEntity<List<ListaDeCompra>> getListasSemCache(){
+		Users user = userService.getUserCurrent();
+		List<ListaDeCompra> listas = listaDeCompraService.getListas(user);
+		if(listas.size() > 0) {
+			return ResponseEntity.ok().body(listas);
+		} else {
+			return ResponseEntity.noContent().build();
+		}
+	}
+	
 	private void simulateSlowService() {
         try {
             long time = 500L;

@@ -47,6 +47,21 @@ public class ProdutoController {
 		}
 	}
 	
+	@GetMapping("/semcache")
+	public ResponseEntity<List<Produto>> getProdutosSemCache(){
+        simulateSlowService();
+		Users user = userService.getUserCurrent();
+		List<Produto> produtos = this.produtoService.getProdutos(user);
+		if(produtos.isEmpty()) {
+			return ResponseEntity.noContent().build();
+		}
+		if(produtos.size() > 0) {
+			return ResponseEntity.ok().body(produtos);
+		} else {
+			return ResponseEntity.noContent().build();
+		}
+	}
+	
 	private void simulateSlowService() {
         try {
             long time = 500L;
