@@ -133,6 +133,7 @@ Para poder visualizar com maior clareza o diferencia de tempo entre as requisiç
 Pode se observar que as rotas com cache tiveram melhor êxito ao passar do tempo foram as que possuiam cache, entretanto vale observar que as rotas que possuem cache tiveram suas primeiras requisições em tempos grandes, devido ao fato da sua configuração. 
 
 Mais testes realizados com o Jmeter com diversos gráficos voce pode encontrar aqui: 
+https://htmlpreview.github.io/?https://github.com/tsleolima/daca-project/blob/master/relatorio-project-jmeter/index.html
 ## Arquitetura  
   
 ![](https://raw.githubusercontent.com/tsleolima/daca-project/master/assets/diagram.jpg)
