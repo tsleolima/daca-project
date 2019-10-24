@@ -110,7 +110,7 @@ O sistema também está implementado com roles, por default todo usuário inicia
   
 ### Gráfico que mostra o fluxo de autenticação  
   
-![](https://raw.githubusercontent.com/tsleolima/daca-project/master/assets/authentication .jpg)  
+![](https://raw.githubusercontent.com/tsleolima/daca-project/master/assets/authentication.jpg)  
   
 ### Rotas para você realizar cadastro e login no sistema  
   
