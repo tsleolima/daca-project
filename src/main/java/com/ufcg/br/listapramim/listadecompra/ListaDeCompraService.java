@@ -83,19 +83,19 @@ public class ListaDeCompraService {
 	
 	
 
-	public ListaDeCompra getListaCompra(Users user,ObjectId id) {
-		
-		ListaDeCompra listaBuscada = findListaBy_id(user,id);		
-		ArrayList<Compra> comprasOrdenadas = new ArrayList<Compra>();
-		
-		comprasOrdenadas.addAll(produtosHigienePessoal(listaBuscada.getCompras()));
-		comprasOrdenadas.addAll(produtosLimpeza(listaBuscada.getCompras()));
-		comprasOrdenadas.addAll(produtosIndustrializados(listaBuscada.getCompras()));
-		comprasOrdenadas.addAll(produtosNaoIndustrializados(listaBuscada.getCompras()));
-			
-		listaBuscada.setCompras(comprasOrdenadas);		
-		return listaBuscada;
-	}
+//	public ListaDeCompra getListaCompra(Users user,ObjectId id) {
+//		
+//		ListaDeCompra listaBuscada = findListaBy_id(user,id);		
+//		ArrayList<Compra> comprasOrdenadas = new ArrayList<Compra>();
+//		
+//		comprasOrdenadas.addAll(produtosHigienePessoal(listaBuscada.getCompras()));
+//		comprasOrdenadas.addAll(produtosLimpeza(listaBuscada.getCompras()));
+//		comprasOrdenadas.addAll(produtosIndustrializados(listaBuscada.getCompras()));
+//		comprasOrdenadas.addAll(produtosNaoIndustrializados(listaBuscada.getCompras()));
+//			
+//		listaBuscada.setCompras(comprasOrdenadas);		
+//		return listaBuscada;
+//	}
 	
 	private ListaDeCompra findListaBy_id(Users user,ObjectId id) {
 		ArrayList<ListaDeCompra> listasUser = (ArrayList<ListaDeCompra>) getListas(user);
@@ -107,21 +107,21 @@ public class ListaDeCompraService {
 		return null;
 	}
 
-	public ArrayList<Compra> produtosIndustrializados(ArrayList<Compra> compras) {
-		return this.produtoService.produtosIndustrializados(compras);
-	}
-
-	public ArrayList<Compra> produtosNaoIndustrializados(ArrayList<Compra> compras) {
-		return this.produtoService.produtosNaoIndustrializados(compras);
-	}
-	
-	public ArrayList<Compra> produtosLimpeza(ArrayList<Compra> compras) {
-		return this.produtoService.produtosLimpeza(compras);
-	}
-	
-	public ArrayList<Compra> produtosHigienePessoal(ArrayList<Compra> compras) {
-		return this.produtoService.produtosHigienePessoal(compras);
-	}
+//	public ArrayList<Compra> produtosIndustrializados(ArrayList<Compra> compras) {
+//		return this.produtoService.produtosIndustrializados(compras);
+//	}
+//
+//	public ArrayList<Compra> produtosNaoIndustrializados(ArrayList<Compra> compras) {
+//		return this.produtoService.produtosNaoIndustrializados(compras);
+//	}
+//	
+//	public ArrayList<Compra> produtosLimpeza(ArrayList<Compra> compras) {
+//		return this.produtoService.produtosLimpeza(compras);
+//	}
+//	
+//	public ArrayList<Compra> produtosHigienePessoal(ArrayList<Compra> compras) {
+//		return this.produtoService.produtosHigienePessoal(compras);
+//	}
 	
 
 	public ArrayList<ListaDeCompra> buscarListaProduto(Users user, ObjectId idProduto) {
@@ -231,32 +231,32 @@ public class ListaDeCompraService {
 		return media;
 	}
 
-	public ArrayList<SugestaoDAO> sugerirLocalDeCompra(Users user,ObjectId id) {
-		ListaDeCompra lista = this.listaDeCompraRepository.findListaBy_id(id);
-		ArrayList<Produto> produtosComPreco = this.produtoService.getProdutosComPreco(user,lista);
-		
-		ArrayList<SugestaoDAO> sugestoes = new ArrayList<SugestaoDAO>();
-		
-		if(produtosComPreco.size() > 0) {
-			ArrayList<ItemVenda> itensAvenda = new ArrayList<ItemVenda>();
-			for (Produto p : produtosComPreco) {
-				itensAvenda.addAll(p.getMapaDePrecos());
-			}
-
-	        Map<String,List<ItemVenda>> mapItem = new HashMap<>();
-	        mapItem = itensAvenda.stream()
-	        		.collect(Collectors.groupingBy(ItemVenda::getNomeLocalVenda));
-	        
-	        for (Entry<String, List<ItemVenda>> entry : mapItem.entrySet()) {
-	        	double precoFinal = 0;
-	        	for (ItemVenda itemVenda : entry.getValue()) {
-					precoFinal += itemVenda.getPreco();
-				}
-	        	SugestaoDAO s = new SugestaoDAO(entry.getKey(),precoFinal,entry.getValue());
-	        	sugestoes.add(s);
-	        }
-			return sugestoes;
-		}else return null;
-	}
+//	public ArrayList<SugestaoDAO> sugerirLocalDeCompra(Users user,ObjectId id) {
+//		ListaDeCompra lista = this.listaDeCompraRepository.findListaBy_id(id);
+//		ArrayList<Produto> produtosComPreco = this.produtoService.getProdutosComPreco(user,lista);
+//		
+//		ArrayList<SugestaoDAO> sugestoes = new ArrayList<SugestaoDAO>();
+//		
+//		if(produtosComPreco.size() > 0) {
+//			ArrayList<ItemVenda> itensAvenda = new ArrayList<ItemVenda>();
+//			for (Produto p : produtosComPreco) {
+//				itensAvenda.addAll(p.getMapaDePrecos());
+//			}
+//
+//	        Map<String,List<ItemVenda>> mapItem = new HashMap<>();
+//	        mapItem = itensAvenda.stream()
+//	        		.collect(Collectors.groupingBy(ItemVenda::getNomeLocalVenda));
+//	        
+//	        for (Entry<String, List<ItemVenda>> entry : mapItem.entrySet()) {
+//	        	double precoFinal = 0;
+//	        	for (ItemVenda itemVenda : entry.getValue()) {
+//					precoFinal += itemVenda.getPreco();
+//				}
+//	        	SugestaoDAO s = new SugestaoDAO(entry.getKey(),precoFinal,entry.getValue());
+//	        	sugestoes.add(s);
+//	        }
+//			return sugestoes;
+//		}else return null;
+//	}
 
 }

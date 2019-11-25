@@ -63,7 +63,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	            "Unauthorized");
 	}
 	
-//	 Usado para adicionar role admin no db
+////	 Usado para adicionar role admin no db
 //	@Bean
 //	CommandLineRunner init(RoleRepository roleRepository) {
 //	    return args -> {
