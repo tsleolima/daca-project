@@ -2,18 +2,22 @@ package com.ufcg.br.listapramim.listadecompra;
 
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import com.ufcg.br.listapramim.usuario.Users;
 
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import org.bson.types.ObjectId;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 
 @Repository
-public interface ListaDeCompraRepository extends MongoRepository<ListaDeCompra,ObjectId>{
+public interface ListaDeCompraRepository extends ReactiveMongoRepository<ListaDeCompra,ObjectId>{
 	
-	ListaDeCompra findListaBy_id(ObjectId id);
+	Mono<ListaDeCompra> findBy_id(ObjectId id);
 
-	ListaDeCompra findProdutoByDescritor(String descritor);
+	Mono<ListaDeCompra> findByDescritor(String descritor);
 	
-	List<ListaDeCompra> findListaByUser(ObjectId id);
+	Flux<ListaDeCompra> findByUser(Users user);
+
+	Flux<ListaDeCompra> findByDescritorAndUser(String descritor, Users user);
 
 }

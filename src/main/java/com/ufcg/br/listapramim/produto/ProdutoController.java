@@ -1,15 +1,11 @@
 package com.ufcg.br.listapramim.produto;
 
-import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 import org.bson.types.ObjectId;
-import org.omg.CosNaming.NamingContextPackage.NotFound;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,10 +16,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
+import com.amazonaws.services.sqs.AmazonSQS;
+import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
+import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
+import com.amazonaws.services.sqs.model.SendMessageRequest;
 import com.ufcg.br.listapramim.usuario.CustomUserDetailsService;
 import com.ufcg.br.listapramim.usuario.Users;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -31,17 +29,35 @@ import reactor.core.publisher.Mono;
 @RequestMapping({"/api/produto"})
 public class ProdutoController {
 	
+	@Value("${sqs.url}")
+	private String sqsUrl;
+	final AmazonSQS sqs = AmazonSQSClientBuilder.defaultClient();
+		
+	public void readMensages() {
+		sqs.sendMessage(new SendMessageRequest(sqsUrl,"minha primeira mensagem no sqs"));
+		System.out.println("Receiving messages from MyQueue.\n");
+		final ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(sqsUrl)
+		.withMaxNumberOfMessages(10)
+		.withWaitTimeSeconds(3);
+		final List<com.amazonaws.services.sqs.model.Message> messages =   
+				sqs.receiveMessage(receiveMessageRequest).getMessages();
+		
+		messages.stream().forEach(s -> System.out.println(s.getBody()));
+	}
+	
 	@Autowired
 	private CustomUserDetailsService userService;
 	
 	@Autowired
 	private ProdutoService produtoService;
 	
+	// (produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	@GetMapping
 	@Cacheable("produtos")
 	public Flux<Produto> getProdutos(){
 		Users user = userService.getUserCurrent();
 		Flux<Produto> produtos = this.produtoService.getProdutos(user);
+		readMensages();
 		return produtos;		
 	}
 
@@ -53,7 +69,7 @@ public class ProdutoController {
 		return produto.map( p -> ResponseEntity.ok().body(p))
 				.switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
 		
-		}
+	}
 	
 	@GetMapping("/ordered")
 	public Flux<Produto> getProdutosOrdenados(){
@@ -75,49 +91,37 @@ public class ProdutoController {
 		Flux<ItemVenda> itensVenda = this.produtoService.getProdutosOrdenadosPreco(user);
 		return itensVenda;
 	}
-//	
-//	@GetMapping("/search")
-//	public ResponseEntity<ArrayList<Produto>> pesquisaProdutoNome(@RequestParam String nome){
-//		Users user = userService.getUserCurrent();
-//		ArrayList<Produto> produtos = this.produtoService.pesquisaProdutoNome(user,nome);
-//		if(produtos.size() > 0) {
-//			return ResponseEntity.ok().body(produtos);
-//		} else {
-//			return ResponseEntity.noContent().build();
-//		}
-//	}
-//	
-//	@PostMapping
-//	@CacheEvict(value="produtos", allEntries = true) 
-//	public ResponseEntity<Produto> cadastrarProduto(@RequestBody ProdutoDAO produtoAdd) {
-//		Users user = userService.getUserCurrent();
-//		Produto produto = this.produtoService.cadastrarProduto(user,produtoAdd);
-//		if(produto != null) {
-//			return ResponseEntity.ok().body(produto);
-//		}
-//		return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
-//	}
-//
-//	@PutMapping("/{id}")
-//	public ResponseEntity<Produto> atualizarProduto (@PathVariable ObjectId id, @RequestBody Produto produtoAtt) {
-//		Users user = userService.getUserCurrent();
-//		Produto produto = this.produtoService.atualizarProduto(user,id,produtoAtt);
-//		if(produto != null) {
-//			return ResponseEntity.ok().body(produto);
-//		} else {
-//			return ResponseEntity.notFound().build();
-//		}
-//	}
-//	
-//	@DeleteMapping("/{id}")
-//	public ResponseEntity<?> deletarProduto (@PathVariable ObjectId id) {
-//		Users user = userService.getUserCurrent();
-//		Produto produto = this.produtoService.deletarProduto(user,id);
-//		if(produto != null) {
-//			return ResponseEntity.ok().build();
-//		} else {
-//			return ResponseEntity.notFound().build();
-//		}
-//	}
-//	
+	
+	@GetMapping("/search")
+	public Flux<ResponseEntity<Produto>> pesquisaProdutoNome(@RequestParam String nome){
+		Users user = userService.getUserCurrent();
+		Flux<Produto> produtos = this.produtoService.pesquisaProdutoNome(user,nome);
+		return produtos.map( p -> ResponseEntity.ok().body(p))
+				.switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
+	}
+	
+	@PostMapping
+	@CacheEvict(value="produtos", allEntries = true) 
+	public Mono<ResponseEntity<Produto>> cadastrarProduto(@RequestBody ProdutoDAO produtoAdd) {
+		Users user = userService.getUserCurrent();
+		Mono<Produto> produto = this.produtoService.cadastrarProduto(user,produtoAdd);
+		return produto.map( p -> ResponseEntity.ok().body(p))
+				.switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
+	}
+
+	@PutMapping("/{id}")
+	public Mono<ResponseEntity<Produto>> atualizarProduto (@PathVariable ObjectId id, @RequestBody Produto produtoAtt) {
+		Users user = userService.getUserCurrent();
+		Mono<Produto> produto = this.produtoService.atualizarProduto(user,id,produtoAtt);
+		return produto.map( p -> ResponseEntity.ok().body(p))
+				.switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
+	}
+	
+	@DeleteMapping("/{id}")
+	public Mono<ResponseEntity<Object>> deletarProduto (@PathVariable ObjectId id) {
+		Users user = userService.getUserCurrent();
+		Mono<Void> response = this.produtoService.deletarProduto(user,id);
+		return response.map( r -> ResponseEntity.ok().build())
+				.switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
+	}	
 }

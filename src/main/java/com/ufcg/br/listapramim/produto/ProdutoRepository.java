@@ -4,6 +4,8 @@ import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
 
+import com.ufcg.br.listapramim.usuario.Users;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -12,8 +14,8 @@ public interface ProdutoRepository extends ReactiveMongoRepository<Produto, Obje
 	
 	Mono<Produto> findBy_id(ObjectId _id);
 
-	Mono<Produto> findProdutoByNome(String nome);
-
-	Flux<Produto> findByUser(ObjectId user);
+	Flux<Produto> findByUser(Users user);
+	
+	Mono<Produto> findByNomeAndUser(String nome,Users user);
 	
 }

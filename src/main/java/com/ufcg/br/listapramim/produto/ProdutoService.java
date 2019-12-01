@@ -1,24 +1,17 @@
 package com.ufcg.br.listapramim.produto;
 
-import java.lang.reflect.Array;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.logging.Log;
 import org.bson.types.ObjectId;
-import org.omg.CosNaming.NamingContextPackage.NotFound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.ufcg.br.listapramim.listadecompra.Compra;
 import com.ufcg.br.listapramim.listadecompra.CompraNomeComparator;
 import com.ufcg.br.listapramim.listadecompra.ItemVendaPrecoComparator;
 import com.ufcg.br.listapramim.listadecompra.ListaDeCompra;
 import com.ufcg.br.listapramim.usuario.Users;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -29,8 +22,7 @@ public class ProdutoService {
 	private ProdutoRepository produtoRepository;
 
 	public Flux<Produto> getProdutos (Users user) {
-		Flux<Produto> produtos = this.produtoRepository.findAll()
-				.filter(produto -> produto.getUser().getId().equals(user.getId()));
+		Flux<Produto> produtos = produtoRepository.findByUser(user);
 		return produtos;
 	} 
 	 
@@ -63,108 +55,88 @@ public class ProdutoService {
 		return itensAvenda;
 	}
 	
-//	public Produto cadastrarProduto(Users user, ProdutoDAO produto) {
-//		Produto updated;
-//		ArrayList<Produto> produtosUser = (ArrayList<Produto>) getProdutos(user);
-//		if(findProdutoByNome(produtosUser,produto.getNome()) == null) {
-//			
-//			if (produto.getQuantidade() != null) updated = new Produto(produto.getNome(),produto.getCategoria(),produto.getTipo(),produto.getQuantidade());
-//			else updated = new Produto(produto.getNome(),produto.getCategoria(),produto.getTipo());
-//			updated.setUser(user);
-//			return this.produtoRepository.save(updated);
-//			
-//		} 
-//		return null;
-//	}
-//
-//	private Object findProdutoByNome(ArrayList<Produto> produtosUser, String nome) {
-//		Produto produtofinal = null;
-//		for (Produto produto : produtosUser) {
-//			if(produto.getNome().equals(nome)) {
-//				produtofinal = produto;
-//			}
-//		}
-//		return produtofinal;
-//	}
-//
-//	public Produto atualizarProduto(Users user,ObjectId id, Produto produto) {
-//		Produto produtoBuscado = getProduto(user, id);
-//		if(produtoBuscado != null) {
-//			produtoBuscado.setNome(produto.getNome());
-//			produtoBuscado.setCategoria(produto.getCategoria());
-//			produtoBuscado.setQuantidade(produto.getQuantidade());
-//			produtoBuscado.setTipo(produto.getTipo());
-//			produtoBuscado.setMapaDePrecos(produto.getMapaDePrecos());
-//			Produto updated = produtoRepository.save(produtoBuscado);
-//			return updated;}
-//		else
-//			return produtoBuscado;
-//	}
-//
-//	public Produto deletarProduto(Users user,ObjectId id) {
-//		Produto produto = getProduto(user, id);
-//		if(produto != null) produtoRepository.delete(produto);
-//		return produto;
-//				
-//	}
-//
-//	public ArrayList<Produto> pesquisaProdutoNome(Users user, String nome) {
-//		ArrayList<Produto> produtos = (ArrayList<Produto>) getProdutos(user);
-//		ArrayList<Produto> saida = new ArrayList<Produto>();
-//		for (Produto produto : produtos) {
-//			if(produto.getNome().toLowerCase().contains(nome.toLowerCase())) {
-//				saida.add(produto);
-//			}
-//		}
-//		
-//		return saida;
-//	}
-//
-//	public ArrayList<Compra> produtosIndustrializados(ArrayList<Compra> compras) {
-//		ArrayList<Compra> comprasCategoriaSelecionada = (ArrayList<Compra>) compras.stream()
-//				.filter(compra -> this.produtoRepository.findProdutoBy_id(compra.getIdProduto()).getCategoria().equals(Categoria.valueOf("ALIMENTOSINDUSTRIALIZADOS")))
-//				.collect(Collectors.toList());
-//		
-//		Collections.sort(comprasCategoriaSelecionada, new CompraNomeComparator());
-//		return comprasCategoriaSelecionada;
-//	}
-//
-//	public ArrayList<Compra> produtosNaoIndustrializados(ArrayList<Compra> compras) {
-//		ArrayList<Compra> comprasCategoriaSelecionada = (ArrayList<Compra>) compras.stream()
-//				.filter(compra -> this.produtoRepository.findProdutoBy_id(compra.getIdProduto()).getCategoria().equals(Categoria.valueOf("ALIMENTOSNAOINDUSTRIALIZADOS")))
-//				.collect(Collectors.toList());	
-//		
-//		Collections.sort(comprasCategoriaSelecionada, new CompraNomeComparator());
-//		return comprasCategoriaSelecionada;
-//	}
-//
-//	public ArrayList<Compra> produtosLimpeza(ArrayList<Compra> compras) {
-//		ArrayList<Compra> comprasCategoriaSelecionada = (ArrayList<Compra>) compras.stream()
-//				.filter(compra -> this.produtoRepository.findProdutoBy_id(compra.getIdProduto()).getCategoria().equals(Categoria.valueOf("LIMPEZA")))
-//				.collect(Collectors.toList());
-//		
-//		Collections.sort(comprasCategoriaSelecionada, new CompraNomeComparator());
-//		return comprasCategoriaSelecionada;
-//	}
-//
-//	public ArrayList<Compra> produtosHigienePessoal(ArrayList<Compra> compras) {
-//		ArrayList<Compra> comprasCategoriaSelecionada = (ArrayList<Compra>) compras.stream()
-//				.filter(compra -> this.produtoRepository.findProdutoBy_id(compra.getIdProduto()).getCategoria().equals(Categoria.valueOf("HIGIENEPESSOAL")))
-//				.collect(Collectors.toList());
-//		
-//		Collections.sort(comprasCategoriaSelecionada, new CompraNomeComparator());
-//		return comprasCategoriaSelecionada;
-//	}
-//
-//	public ArrayList<Produto> getProdutosComPreco(Users user,ListaDeCompra lista) {
-//		ArrayList<Produto> produtos = new ArrayList<Produto>();
-//		for (Compra compra : lista.getCompras()) {
-//			Produto produto = this.getProduto(user,compra.getIdProduto());
-//			if(produto.getMapaDePrecos() != null) {
-//				produtos.add(produto);
-//			}
-//		}
-//		return produtos;
-//	}
-//	
+	public Mono<Produto> cadastrarProduto(Users user, ProdutoDAO produto) {
+		Produto updated;
+		Mono<Produto> produtoUser = this.produtoRepository.findByNomeAndUser(produto.getNome(), user);
+			
+		if (produto.getQuantidade() != null) updated = new Produto(produto.getNome(),produto.getCategoria(),produto.getTipo(),produto.getQuantidade());
+		else updated = new Produto(produto.getNome(),produto.getCategoria(),produto.getTipo());
+		updated.setUser(user);
+			
+		return produtoUser.then(this.produtoRepository.save(updated)).switchIfEmpty(Mono.just(null));
+		
+	}
+
+	public Mono<Produto> atualizarProduto(Users user,ObjectId id, Produto produto) {
+		Mono<Produto> produtoBuscado = getProduto(user, id);
+		return produtoBuscado.flatMap(p -> 
+				{p.setNome(produto.getNome());
+				 p.setCategoria(produto.getCategoria());
+				 p.setMapaDePrecos(produto.getMapaDePrecos());
+				 p.setTipo(produto.getTipo());
+				 p.setQuantidade(produto.getQuantidade());
+				 Mono<Produto> updated = produtoRepository.save(p);
+				 return updated;
+				})			
+				.switchIfEmpty(Mono.just(null));
+	}
+
+	public Mono<Void> deletarProduto(Users user,ObjectId id) {
+		Mono<Produto> produto = getProduto(user, id);
+		return produto.flatMap(p -> produtoRepository.deleteById(id)).switchIfEmpty(Mono.just(null));
+	}
+
+	public Flux<Produto> pesquisaProdutoNome(Users user, String nome) {
+		Flux<Produto> produtos = getProdutos(user);		
+		return produtos.filter(produto -> 
+			produto.getNome().toLowerCase()
+			.contains(nome.toLowerCase()));
+	}
+
+	public ArrayList<Compra> produtosIndustrializados(ArrayList<Compra> compras) {
+		ArrayList<Compra> comprasCategoriaSelecionada = (ArrayList<Compra>) compras.stream()
+				.filter(compra -> this.produtoRepository.findBy_id(compra.getIdProduto()).block().getCategoria().equals(Categoria.valueOf("ALIMENTOSINDUSTRIALIZADOS")))
+				.collect(Collectors.toList());
+		
+		Collections.sort(comprasCategoriaSelecionada, new CompraNomeComparator());
+		return comprasCategoriaSelecionada;
+	}
+
+	public ArrayList<Compra> produtosNaoIndustrializados(ArrayList<Compra> compras) {	
+		ArrayList<Compra> comprasCategoriaSelecionada = (ArrayList<Compra>) compras.stream()
+				.filter(compra -> this.produtoRepository.findBy_id(compra.getIdProduto()).block().getCategoria().equals(Categoria.valueOf("ALIMENTOSNAOINDUSTRIALIZADOS")))
+				.collect(Collectors.toList());
+		
+		Collections.sort(comprasCategoriaSelecionada, new CompraNomeComparator());
+		return comprasCategoriaSelecionada;
+
+	}
+
+	public ArrayList<Compra> produtosLimpeza(ArrayList<Compra> compras) {
+		ArrayList<Compra> comprasCategoriaSelecionada = (ArrayList<Compra>) compras.stream()
+				.filter(compra -> this.produtoRepository.findBy_id(compra.getIdProduto()).block().getCategoria().equals(Categoria.valueOf("LIMPEZA")))
+				.collect(Collectors.toList());
+		
+		Collections.sort(comprasCategoriaSelecionada, new CompraNomeComparator());
+		return comprasCategoriaSelecionada;
+	}
+
+	public ArrayList<Compra> produtosHigienePessoal(ArrayList<Compra> compras) {
+		ArrayList<Compra> comprasCategoriaSelecionada = (ArrayList<Compra>) compras.stream()
+				.filter(compra -> this.produtoRepository.findBy_id(compra.getIdProduto()).block().getCategoria().equals(Categoria.valueOf("HIGIENEPESSOAL")))
+				.collect(Collectors.toList());
+		
+		Collections.sort(comprasCategoriaSelecionada, new CompraNomeComparator());
+		return comprasCategoriaSelecionada;
+	}
+
+	public Flux<Produto> getProdutosComPreco(Users user,ListaDeCompra lista) {
+		Flux<Produto> produtos = Flux.empty();
+		for (Compra compra : lista.getCompras()) {
+			Mono<Produto> produto = this.getProduto(user,compra.getIdProduto());
+			produto.filter( p -> p.getMapaDePrecos() != null).mergeWith(produtos);
+		}
+		return produtos;
+	}
+	
 }

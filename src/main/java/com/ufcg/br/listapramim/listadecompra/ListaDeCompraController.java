@@ -34,9 +34,8 @@ public class ListaDeCompraController {
 	private ListaDeCompraService listaDeCompraService;
 	
 	@GetMapping
-//	@Cacheable("listas")
+	@Cacheable("listas")
 	public ResponseEntity<List<ListaDeCompra>> getListas(){
-//        simulateSlowService();
 		Users user = userService.getUserCurrent();
 		List<ListaDeCompra> listas = listaDeCompraService.getListas(user);
 		if(listas.size() > 0) {
@@ -46,37 +45,17 @@ public class ListaDeCompraController {
 		}
 	}
 	
-	@GetMapping("/semcache")
-	public ResponseEntity<List<ListaDeCompra>> getListasSemCache(){
+	@GetMapping("/{id}")
+	public ResponseEntity<ListaDeCompra> getListaCompra(@PathVariable ObjectId id){
 		Users user = userService.getUserCurrent();
-		List<ListaDeCompra> listas = listaDeCompraService.getListas(user);
-		if(listas.size() > 0) {
-			return ResponseEntity.ok().body(listas);
+		ListaDeCompra lista = this.listaDeCompraService.getListaCompra(user,id);
+		if(lista != null) {
+			return ResponseEntity.ok().body(lista);
 		} else {
 			return ResponseEntity.noContent().build();
 		}
 	}
 	
-//	private void simulateSlowService() {
-//        try {
-//            long time = 500L;
-//            Thread.sleep(time);
-//        } catch (InterruptedException e) {
-//            throw new IllegalStateException(e);
-//        }		
-//	}
-	
-//	@GetMapping("/{id}")
-//	public ResponseEntity<ListaDeCompra> getListaCompra(@PathVariable ObjectId id){
-//		Users user = userService.getUserCurrent();
-//		ListaDeCompra lista = this.listaDeCompraService.getListaCompra(user,id);
-//		if(lista != null) {
-//			return ResponseEntity.ok().body(lista);
-//		} else {
-//			return ResponseEntity.noContent().build();
-//		}
-//	}
-//	
 	@PostMapping
 	@CacheEvict(value="listas", allEntries = true) 
 	public ResponseEntity<ListaDeCompra> cadastrarLista (@RequestBody ListaDeCompra listaAdd) {
@@ -155,12 +134,12 @@ public class ListaDeCompraController {
 		return ResponseEntity.noContent().build();
 	}
 	
-//	@GetMapping("/suggestion/{id}")
-//	public ResponseEntity<ArrayList<SugestaoDAO>> sugerirLocalDeCompra(@PathVariable ObjectId id){
-//		Users user = userService.getUserCurrent();
-//		ArrayList<SugestaoDAO> sugestoes = this.listaDeCompraService.sugerirLocalDeCompra(user,id);
-//		if(sugestoes != null) return ResponseEntity.ok().body(sugestoes);
-//		return ResponseEntity.noContent().build();
-//	}
+	@GetMapping("/suggestion/{id}")
+	public ResponseEntity<ArrayList<SugestaoDAO>> sugerirLocalDeCompra(@PathVariable ObjectId id){
+		Users user = userService.getUserCurrent();
+		ArrayList<SugestaoDAO> sugestoes = this.listaDeCompraService.sugerirLocalDeCompra(user,id);
+		if(sugestoes != null) return ResponseEntity.ok().body(sugestoes);
+		return ResponseEntity.noContent().build();
+	}
 	
 }
