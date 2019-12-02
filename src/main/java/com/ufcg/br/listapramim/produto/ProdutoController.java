@@ -57,7 +57,6 @@ public class ProdutoController {
 	public Flux<Produto> getProdutos(){
 		Users user = userService.getUserCurrent();
 		Flux<Produto> produtos = this.produtoService.getProdutos(user);
-		readMensages();
 		return produtos;		
 	}
 

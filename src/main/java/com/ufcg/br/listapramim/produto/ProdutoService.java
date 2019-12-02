@@ -62,9 +62,8 @@ public class ProdutoService {
 		if (produto.getQuantidade() != null) updated = new Produto(produto.getNome(),produto.getCategoria(),produto.getTipo(),produto.getQuantidade());
 		else updated = new Produto(produto.getNome(),produto.getCategoria(),produto.getTipo());
 		updated.setUser(user);
-			
-		return produtoUser.then(this.produtoRepository.save(updated)).switchIfEmpty(Mono.just(null));
 		
+		return produtoUser.filter( p -> p != null ).switchIfEmpty(this.produtoRepository.save(updated));
 	}
 
 	public Mono<Produto> atualizarProduto(Users user,ObjectId id, Produto produto) {
@@ -78,12 +77,16 @@ public class ProdutoService {
 				 Mono<Produto> updated = produtoRepository.save(p);
 				 return updated;
 				})			
-				.switchIfEmpty(Mono.just(null));
+				.switchIfEmpty(Mono.empty());
 	}
 
 	public Mono<Void> deletarProduto(Users user,ObjectId id) {
 		Mono<Produto> produto = getProduto(user, id);
-		return produto.flatMap(p -> produtoRepository.deleteById(id)).switchIfEmpty(Mono.just(null));
+		return produto
+				.flatMap( d -> {
+					return produtoRepository.deleteById(id);
+				})
+				.switchIfEmpty(Mono.empty());
 	}
 
 	public Flux<Produto> pesquisaProdutoNome(Users user, String nome) {
