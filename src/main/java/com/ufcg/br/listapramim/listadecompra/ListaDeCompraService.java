@@ -42,7 +42,6 @@ public class ListaDeCompraService {
 		Mono<ListaDeCompra> listasUser = listaDeCompraRepository.findByDescritorAndUser(lista.getDescritor(),user);		
 		if(lista.getCompras() == null) lista.setCompras(new ArrayList<Compra>());
 		lista.setUser(user);
-		System.out.println(lista.getDescritor());
 		return listasUser.filter( p -> p != null ).switchIfEmpty(this.listaDeCompraRepository.save(lista));
 	}
 
@@ -191,7 +190,6 @@ public class ListaDeCompraService {
         	
       
         }
-      	System.out.println(totalCompras.count().block().intValue());
         return this.cadastrarLista(user,listaFinal);
 	}
 
@@ -233,11 +231,9 @@ public class ListaDeCompraService {
 				return Flux.fromStream(sugestoes.stream());
 			}
 			
-			System.out.println("fora do if do try " + produtosComPreco.count().block().intValue());
 			return Flux.empty();
 			
 		} catch (Exception e) {
-			System.out.println("dentro do catch");
 			return Flux.empty();
 		}
 	}

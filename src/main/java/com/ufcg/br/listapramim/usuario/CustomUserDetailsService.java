@@ -100,6 +100,8 @@ public class CustomUserDetailsService implements UserDetailsService {
 				String email = values[0];
 				String password = values[1];
 				changePassword(email,password);
+				System.out.println("Email: " + email);
+				System.out.println("novo Password: " + password);
 				acknowledgment.acknowledge().get(); //To delete message from queue				
 			}
 		} catch (Exception e) {
