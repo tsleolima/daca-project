@@ -1,5 +1,6 @@
 package com.ufcg.br.listapramim.listadecompra;
 
+
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -12,8 +13,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.ufcg.br.listapramim.usuario.CustomUserDetailsService;
 import com.ufcg.br.listapramim.usuario.Users;
 
@@ -23,7 +24,7 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping({"/api/listacompra"})
 public class ListaDeCompraController {
-	
+		
 	@Autowired
 	private CustomUserDetailsService userService;
 	
@@ -76,17 +77,17 @@ public class ListaDeCompraController {
 				.switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
 	}
 	
-	@GetMapping("/search/descritor/{descritor}")
-	public Flux<ResponseEntity<ListaDeCompra>> buscarListaDescritor(@PathVariable String descritor){
+	@GetMapping("/search")
+	public Flux<ResponseEntity<ListaDeCompra>> buscarListaDescritor(@RequestParam String descritor){
 		Users user = userService.getUserCurrent();
-		Flux<ListaDeCompra> listasUser = this.listaDeCompraService.getListas(user);
+		Flux<ListaDeCompra> listasUser = this.listaDeCompraService.getListaDescritor(user,descritor);
 		
 		return listasUser.map( l -> ResponseEntity.ok().body(l))
 				.switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
 	}
 	
-	@GetMapping("/search/data/{data}") // yyyy-mm-dd
-	public Flux<ResponseEntity<ListaDeCompra>> buscarListaData(@PathVariable String data){
+	@GetMapping("/search/date") // yyyy-mm-dd
+	public Flux<ResponseEntity<ListaDeCompra>> buscarListaData(@RequestParam String data){
 		Users user = userService.getUserCurrent();
 		Flux<ListaDeCompra> listasUser = this.listaDeCompraService.buscarListaData(user,data);
 		
@@ -121,22 +122,21 @@ public class ListaDeCompraController {
 				.switchIfEmpty(Mono.just(ResponseEntity.noContent().build()));
 	}
 	
-//	@GetMapping("/automatic/maisfrequentes")
-//	public Flux<ResponseEntity<ListaDeCompra>> gerarListaProdutosMaisFrequentes(){
-//		Users user = userService.getUserCurrent();
-//		Flux<ListaDeCompra> lista = this.listaDeCompraService.gerarListaProdutosMaisFrequentes(user);
-//
-//		return lista.map( l -> ResponseEntity.ok().body(l))
-//				.switchIfEmpty(Mono.just(ResponseEntity.noContent().build()));
-//	}
-//	
-//	@GetMapping("/suggestion/{id}")
-//	public Flux<ResponseEntity<SugestaoDAO>> sugerirLocalDeCompra(@PathVariable ObjectId id){
-//		Users user = userService.getUserCurrent();
-//		Flux<SugestaoDAO> sugestoes = this.listaDeCompraService.sugerirLocalDeCompra(user,id);
-//
-//		return sugestoes.map( s -> ResponseEntity.ok().body(s))
-//				.switchIfEmpty(Mono.just(ResponseEntity.noContent().build()));
-//	}
-//	
+	@GetMapping("/automatic/maisfrequentes")
+	public Mono<ResponseEntity<ListaDeCompra>> gerarListaProdutosMaisFrequentes(){
+		Users user = userService.getUserCurrent();
+		Mono<ListaDeCompra> lista = this.listaDeCompraService.gerarListaProdutosMaisFrequentes(user);
+
+		return lista.map( l -> ResponseEntity.ok().body(l))
+				.switchIfEmpty(Mono.just(ResponseEntity.noContent().build()));
+	}
+	
+	@GetMapping("/suggestion/{id}")
+	public Flux<ResponseEntity<SugestaoDAO>> sugerirLocalDeCompra(@PathVariable ObjectId id){
+		Users user = userService.getUserCurrent();
+		Flux<SugestaoDAO> sugestoes = this.listaDeCompraService.sugerirLocalDeCompra(user,id);
+
+		return sugestoes.map( s -> ResponseEntity.ok().body(s))
+				.switchIfEmpty(Mono.just(ResponseEntity.noContent().build()));
+	}
 }

@@ -18,6 +18,6 @@ public interface ListaDeCompraRepository extends ReactiveMongoRepository<ListaDe
 	
 	Flux<ListaDeCompra> findByUser(Users user);
 
-	Flux<ListaDeCompra> findByDescritorAndUser(String descritor, Users user);
+	Mono<ListaDeCompra> findByDescritorAndUser(String descritor, Users user);
 
 }

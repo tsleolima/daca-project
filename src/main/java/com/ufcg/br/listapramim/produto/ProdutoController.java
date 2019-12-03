@@ -1,9 +1,7 @@
 package com.ufcg.br.listapramim.produto;
 
-import java.util.List;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.amazonaws.services.sqs.AmazonSQS;
-import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
-import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
-import com.amazonaws.services.sqs.model.SendMessageRequest;
 import com.ufcg.br.listapramim.usuario.CustomUserDetailsService;
 import com.ufcg.br.listapramim.usuario.Users;
 import reactor.core.publisher.Flux;
@@ -28,23 +22,7 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping({"/api/produto"})
 public class ProdutoController {
-	
-	@Value("${sqs.url}")
-	private String sqsUrl;
-	final AmazonSQS sqs = AmazonSQSClientBuilder.defaultClient();
 		
-	public void readMensages() {
-		sqs.sendMessage(new SendMessageRequest(sqsUrl,"minha primeira mensagem no sqs"));
-		System.out.println("Receiving messages from MyQueue.\n");
-		final ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(sqsUrl)
-		.withMaxNumberOfMessages(10)
-		.withWaitTimeSeconds(3);
-		final List<com.amazonaws.services.sqs.model.Message> messages =   
-				sqs.receiveMessage(receiveMessageRequest).getMessages();
-		
-		messages.stream().forEach(s -> System.out.println(s.getBody()));
-	}
-	
 	@Autowired
 	private CustomUserDetailsService userService;
 	

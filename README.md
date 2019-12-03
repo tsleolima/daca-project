@@ -134,6 +134,34 @@ Pode se observar que as rotas com cache tiveram melhor êxito ao passar do tempo
 
 Mais testes realizados com o Jmeter com diversos gráficos voce pode encontrar aqui: 
 https://htmlpreview.github.io/?https://github.com/tsleolima/daca-project/blob/master/relatorio-project-jmeter/index.html
+
+## Tecnologias utilizadas para escalar a aplicação
+
+ - **Reactor - Reactive Architecture**
+ - **SQS AWS - Amazon Single Queue Service**
+ 
+
+**Reactor - Reactive Architecture**
+ 
+ 	A Arquitetura reativa vem como uma solução para sistemas que até então ficavam bloqueados esperando uma resposta do servidor, e através do **Reactor** podemos construir uma aplicação reativa, que reage as solicitações feitas pelo client.
+ 	É importante notar que precisamos modificar nosso código para que o mesmo utilize dessas features, as modificações mais importantes feitas foram a do Spring Data, utilizando a api do **ReactiveMongoRepository**, no qual adicionamos dois novos conceitos o Flux e o Mono, que nada mais são do que fluxos de dados que nossa aplicação irá trabalhar. Outro ponto a ser destacado é o refatoramento do código para o paradigma funcional majoritariamente, pois só assim podemos trabalhar bem com os metodos disponíveis do **Reactor**.
+ 	Para simplificar o trabalho de desenvolvimento e testes da aplicação, os resultados produzidos pelas annotations da Rest ( GET, POST etc) estão definidos por default como Json, para que voce consuma essa API de forma reativa aconselho que utilize **(produces = MediaType.TEXT_EVENT_STREAM_VALUE)** para tal.
+ 	As classes refatoras com Flux/Mono e paradigma funcional se concentram apenas nos controllers e services, a utilização dessa tecnologia pelo usuário é idêntica a anteriormente mesmo com os bloqueios, o diferencial é a escalabilidade que a arquitetura nos proporciona, trazendo um fluxo de blocos de dados.
+ 	
+ **SQS AWS - Amazon Single Queue Service**
+ 
+ 	O SQS da Amazon nada mais é do que um serviço de mensagens, ele consiste em permitir envios e recebimentos de mensagens controlados por uma fila, para utilizar esse serviço da Amazon foi utilizada outra tecnologia chamada **LocalStack**, com ele podemos utilizar os serviços da amazon localmente sem nos preocuparmos em adquirir um plano diretamente na amazon, além de podemos utilizá-lo mesmo offline.
+ 	Tenha paciência ao ler como eu tive para configurar isso na minha máquina, o LocalStack foi instalado usando `pip install localstack`, caso esteja no Windows como eu estive voce tem duas alternativas, utilizar o `pip install localstack[full]` ou instalar o docker ( oque funcionou no meu caso ), utilizei um arquivo .yml com as configurações necessarias para inicializar o localstack, [Arquivo de inicialização do serviço sqs usando docker](https://raw.githubusercontent.com/tsleolima/daca-project/master/assets/docker-compose.yml), esse arquivo foi utilizado usando o comando docker-compose up na pasta do projeto que contem o arquivo acima, instale esse carinha usando o npm :).
+ 	Estamos quase lá, o próximo passo é instalar o cli da aws para criar uma queue, enviar ou até mesmo visualizar as mensagens, caso necessite procure por configure aws cli, para configurar dados como, localização e tipo de retorno dos dados, por fim foi utilizado a rota:porta do sqs do localstack para manipulação incode nesse projeto, algumas delas se encontrar no **properties**.
+ 	A ideia utilizada para consumir esse serviço SQS foi a troca de senha do usuario cadastrado, um Post é realizado para **api/auth/changePassword** passando como query o email do usuario e uma nova senha.  
+	
+ 	a| Funcionalidade de usuario | EndPoint |  
+| ------------------------- | -------- |  
+| POST para mudar a senha | https://listapramim-api.herokuapp.com/api/auth/changePassword?email={email}&newPass={newPass} | 
+	
+	
+Apos realizar a requisição para a rota, veja em **AuthController**, uma mensagem é enviada ao serviço sqs com o email e senha desejados, apenas em uma linha, outro lado no **CustomUserDetailsService** temos uma configuração mais avançada, primeiro olhemos para o método consume, esse método vai recuperar os dados e chamar o método de mudança de senha, entretando para isso anotamos o método com **@SqsListener** para que o método seja executado e que realmente se fique escutando, sempre que ocorra uma alteração na fila, como o envio de uma mensagem, entretando realizar apenas isso trará alguns problemas na nossa aplicação pois precisamos realizar esse Listener em uma thread em paralelo ao Spring, por isso utilizamos os dois **@Beans** e a anotação **@Async**.
+	
 ## Arquitetura  
   
 ![](https://raw.githubusercontent.com/tsleolima/daca-project/master/assets/diagram.jpg)

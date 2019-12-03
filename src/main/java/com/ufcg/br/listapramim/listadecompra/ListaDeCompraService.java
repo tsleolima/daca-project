@@ -4,7 +4,6 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -40,13 +39,11 @@ public class ListaDeCompraService {
 	}
 
 	public Mono<ListaDeCompra> cadastrarLista(Users user, ListaDeCompra lista) {
-		Flux<ListaDeCompra> listasUser = listaDeCompraRepository.findByDescritorAndUser(lista.getDescritor(),user);		
+		Mono<ListaDeCompra> listasUser = listaDeCompraRepository.findByDescritorAndUser(lista.getDescritor(),user);		
 		if(lista.getCompras() == null) lista.setCompras(new ArrayList<Compra>());
 		lista.setUser(user);
-		
-		return listasUser.then(listaDeCompraRepository.save(lista))
-				.switchIfEmpty(Mono.just(null));
-	
+		System.out.println(lista.getDescritor());
+		return listasUser.filter( p -> p != null ).switchIfEmpty(this.listaDeCompraRepository.save(lista));
 	}
 
 	public Mono<ListaDeCompra> atualizarLista(Users user, ObjectId id, ListaDeCompra lista) {
@@ -59,13 +56,13 @@ public class ListaDeCompraService {
 			l.setValorFinal(lista.getValorFinal());
 			Mono<ListaDeCompra> updated = listaDeCompraRepository.save(l);
 			return updated;
-		}).switchIfEmpty(Mono.just(null));
+		}).switchIfEmpty(Mono.empty());
 	}
 
 	public Mono<Void> removerLista(Users user,ObjectId id) {
 		Mono<ListaDeCompra> lista = getListaCompra(user, id);
 		return lista.flatMap(p -> listaDeCompraRepository.deleteById(id))
-				.switchIfEmpty(Mono.just(null));
+				.switchIfEmpty(Mono.empty());
 	}
 	
 	
@@ -75,14 +72,18 @@ public class ListaDeCompraService {
 		Mono<ListaDeCompra> listaBuscada = listaDeCompraRepository.findBy_id(id);
 		Mono<ListaDeCompra> listaUser = listaBuscada.filter( l -> l.getUser().getId().equals(user.getId()));
 		
-		ArrayList<Compra> compras = listaUser.block().getCompras();
-		ArrayList<Compra> comprasOrdenadas = new ArrayList<Compra>();
-		comprasOrdenadas.addAll(produtosHigienePessoal(compras));
-		comprasOrdenadas.addAll(produtosLimpeza(compras));
-		comprasOrdenadas.addAll(produtosIndustrializados(compras));
-		comprasOrdenadas.addAll(produtosNaoIndustrializados(compras));
-		listaUser.block().setCompras(comprasOrdenadas);
-		return listaUser;
+		try {
+			ArrayList<Compra> compras = listaUser.block().getCompras();
+			ArrayList<Compra> comprasOrdenadas = new ArrayList<Compra>();
+			comprasOrdenadas.addAll(produtosHigienePessoal(compras));
+			comprasOrdenadas.addAll(produtosLimpeza(compras));
+			comprasOrdenadas.addAll(produtosIndustrializados(compras));
+			comprasOrdenadas.addAll(produtosNaoIndustrializados(compras));
+			listaUser.block().setCompras(comprasOrdenadas);
+			return listaUser;
+		} catch (Exception e) {
+			return Mono.empty();
+		}
 	}
 
 	public ArrayList<Compra> produtosIndustrializados(ArrayList<Compra> compras) {
@@ -106,7 +107,9 @@ public class ListaDeCompraService {
 		Flux<ListaDeCompra> listas = getListas(user);
 		
 		return listas.flatMap( c -> Flux.fromIterable(c.getCompras())
-				.filter(p -> p.getIdProduto().equals(idProduto)).cast(ListaDeCompra.class));
+				.filter(p -> p.getIdProduto().equals(idProduto))
+				.map( l -> c))
+				.switchIfEmpty(Flux.empty());
 	}
 
 	public Flux<ListaDeCompra> buscarListaData(Users user, String data) {
@@ -130,105 +133,113 @@ public class ListaDeCompraService {
 		Flux<ListaDeCompra> listas = getListas(user);
 		Mono<ListaDeCompra> ultimaLista = listas.elementAt(listas.count().block().intValue()-1);
 		
-		return ultimaLista.map( u -> {
+		return ultimaLista.flatMap( u -> {
 			ListaDeCompra novaLista = new ListaDeCompra();
 			novaLista.setCompras(u.getCompras());
 			novaLista.setDescritor("Lista Automatica Data" + " " + formatDateList(formatDateObjectId(u)));
-			this.cadastrarLista(user,novaLista);
-			return novaLista;
-		}).switchIfEmpty(null);
+			Mono<ListaDeCompra> listAdd = this.cadastrarLista(user,novaLista);
+			return listAdd;
+		}).switchIfEmpty(Mono.empty());
 	
 	}
 
 	public Mono<ListaDeCompra> gerarListaItemCompra(Users user, ObjectId idProduto) {
-		Flux<ListaDeCompra> listas = getListas(user);
+		Flux<ListaDeCompra> listasComProduto = buscarListaProduto(user, idProduto);
 		
-		ListaDeCompra newList = new ListaDeCompra();
-		
-		Flux<ListaDeCompra> result = listas.map( l -> {
-			for (Compra c : l.getCompras()) {
-					if(c.getIdProduto().equals(idProduto)) {
-						return l;
-					}
-			}
-			return null;
-		}).filter( l -> l != null);
-		
-		result.map(ListaDeCompra::toString);
-		System.out.println(result.blockFirst().getDescritor());
-		
-//		newList.setDescritor("Lista Automatica Produto" + " " + formatDateList(formatDateObjectId(result.blockFirst())));
-//		newList.setCompras(result.blockFirst().getCompras());
-//		cadastrarLista(user, newList);
-		
-		return Mono.just(newList);
+		try {
+			ListaDeCompra newList =  new ListaDeCompra();
+			ListaDeCompra ultimaList = listasComProduto.blockLast();
+			newList.setDescritor("Lista Automatica Produto" + " " + formatDateList(formatDateObjectId(ultimaList)));
+			newList.setCompras(ultimaList.getCompras());
+			Mono<ListaDeCompra> listAdd = this.cadastrarLista(user, newList);
+			return listAdd;
+		} catch (Exception e) {
+			return Mono.empty();
+		}		
 	}
 
-//	public ListaDeCompra gerarListaProdutosMaisFrequentes(Users user) {
-//		ArrayList<ListaDeCompra> listas = (ArrayList<ListaDeCompra>) getListas(user);
-//		ArrayList<Compra> totalCompras = new ArrayList<Compra>();
-//		ListaDeCompra listaFinal = new ListaDeCompra();
-//		listaFinal.setCompras(new ArrayList<Compra>());
-//		for (ListaDeCompra lista : listas) {
-//			totalCompras.addAll(lista.getCompras());
-//		}
-//
-//        Map<ObjectId,List<Compra>> mapCompras = new HashMap<>();
-//        mapCompras = totalCompras.stream()
-//        		.collect(Collectors.groupingBy(Compra::getIdProduto));
-//    
-//        for (Entry<ObjectId, List<Compra>> entry : mapCompras.entrySet()) {
-//        	int numeroDeCompras = entry.getValue().size();
-//    		SimpleDateFormat formatter= new SimpleDateFormat("dd-MM-yyyy");
-//    		Date date = new Date(); 
-//        	listaFinal.setDescritor("Lista Automatica Compras" + " " + formatter.format(date).toString());
-//        	if(numeroDeCompras >= (listas.size()/2)) {
-//        		int quantidade = mediaDaQuantidadeCompra(entry.getValue());
-//        		Compra compraMaisFrequente = new Compra(quantidade, entry.getValue().get(0).getIdProduto(), entry.getValue().get(0).getNomeProduto());
-//        		ArrayList<Compra> comprasListaFinal = listaFinal.getCompras();
-//        		comprasListaFinal.add(compraMaisFrequente);
-//        		listaFinal.setCompras(comprasListaFinal);
-//        	}
-//        }
-//        this.cadastrarLista(user,listaFinal);
-//        return listaFinal;
-//	}
-//
-//	private int mediaDaQuantidadeCompra(List<Compra> compras) {
-//		int quantidade = 0;
-//		for (Compra compra : compras) {
-//			quantidade += compra.getQuantidade();
-//		}
-//		int media = Math.floorDiv(quantidade,compras.size());
-//		return media;
-//	}
-//
-//	public ArrayList<SugestaoDAO> sugerirLocalDeCompra(Users user,ObjectId id) {
-//		ListaDeCompra lista = this.listaDeCompraRepository.findListaBy_id(id);
-//		ArrayList<Produto> produtosComPreco = this.produtoService.getProdutosComPreco(user,lista);
-//		
-//		ArrayList<SugestaoDAO> sugestoes = new ArrayList<SugestaoDAO>();
-//		
-//		if(produtosComPreco.size() > 0) {
-//			ArrayList<ItemVenda> itensAvenda = new ArrayList<ItemVenda>();
-//			for (Produto p : produtosComPreco) {
-//				itensAvenda.addAll(p.getMapaDePrecos());
-//			}
-//
-//	        Map<String,List<ItemVenda>> mapItem = new HashMap<>();
-//	        mapItem = itensAvenda.stream()
-//	        		.collect(Collectors.groupingBy(ItemVenda::getNomeLocalVenda));
-//	        
-//	        for (Entry<String, List<ItemVenda>> entry : mapItem.entrySet()) {
-//	        	double precoFinal = 0;
-//	        	for (ItemVenda itemVenda : entry.getValue()) {
-//					precoFinal += itemVenda.getPreco();
-//				}
-//	        	SugestaoDAO s = new SugestaoDAO(entry.getKey(),precoFinal,entry.getValue());
-//	        	sugestoes.add(s);
-//	        }
-//			return sugestoes;
-//		}else return null;
-//	}
+	public Flux<ListaDeCompra> getListaDescritor(Users user, String descritor) {
+		Flux<ListaDeCompra> listas = getListas(user);
+
+		return listas.filter( l -> l.getDescritor().equals(descritor))
+				.switchIfEmpty(Mono.empty());
+	}
+
+	public Mono<ListaDeCompra> gerarListaProdutosMaisFrequentes(Users user) {
+		Flux<ListaDeCompra> listas = getListas(user);
+		ListaDeCompra listaFinal = new ListaDeCompra();
+		listaFinal.setCompras(new ArrayList<Compra>());
+		
+		Flux<Compra> totalCompras = listas.flatMap( c -> Flux.fromIterable(c.getCompras()));
+		
+        Map<ObjectId,List<Compra>> mapCompras = new HashMap<>();
+        mapCompras = totalCompras.toStream()
+        		.collect(Collectors.groupingBy(Compra::getIdProduto));
+    
+        for (Entry<ObjectId, List<Compra>> entry : mapCompras.entrySet()) {
+        	int numeroDeCompras = entry.getValue().size();
+    		SimpleDateFormat formatter= new SimpleDateFormat("dd-MM-yyyy");
+    		Date date = new Date(); 
+        	listaFinal.setDescritor("Lista Automatica Compras" + " " + formatter.format(date).toString());
+        	if(numeroDeCompras >= (listas.count().block().intValue()/2)) {
+        		int quantidade = mediaDaQuantidadeCompra(entry.getValue());
+        		Compra compraMaisFrequente = new Compra(quantidade, entry.getValue().get(0).getIdProduto(), entry.getValue().get(0).getNomeProduto());
+        		ArrayList<Compra> comprasListaFinal = listaFinal.getCompras();
+        		comprasListaFinal.add(compraMaisFrequente);
+        		listaFinal.setCompras(comprasListaFinal);
+        	}
+        	
+      
+        }
+      	System.out.println(totalCompras.count().block().intValue());
+        return this.cadastrarLista(user,listaFinal);
+	}
+
+	private int mediaDaQuantidadeCompra(List<Compra> compras) {
+		int quantidade = 0;
+		for (Compra compra : compras) {
+			quantidade += compra.getQuantidade();
+		}
+		int media = Math.floorDiv(quantidade,compras.size());
+		return media;
+	}
+
+	public Flux<SugestaoDAO> sugerirLocalDeCompra(Users user,ObjectId id) {
+		
+		Mono<ListaDeCompra> lista = this.listaDeCompraRepository.findBy_id(id);
+		
+		try {
+			
+			Flux<Produto> produtosComPreco = this.produtoService.getProdutosComPreco(user,lista.block());
+			
+			ArrayList<SugestaoDAO> sugestoes = new ArrayList<SugestaoDAO>();
+			
+			if(produtosComPreco.count().block().intValue() > 0) {
+				Flux<ItemVenda> itensAvenda = produtosComPreco
+						.flatMap( c -> Flux.fromIterable(c.getMapaDePrecos()));
+
+		        Map<String,List<ItemVenda>> mapItem = new HashMap<>();
+		        mapItem = itensAvenda.toStream()
+		        		.collect(Collectors.groupingBy(ItemVenda::getNomeLocalVenda));
+		        
+		        for (Entry<String, List<ItemVenda>> entry : mapItem.entrySet()) {
+		        	double precoFinal = 0;
+		        	for (ItemVenda itemVenda : entry.getValue()) {
+						precoFinal += itemVenda.getPreco();
+					}
+		        	SugestaoDAO s = new SugestaoDAO(entry.getKey(),precoFinal,entry.getValue());
+		        	sugestoes.add(s);
+		        }
+				return Flux.fromStream(sugestoes.stream());
+			}
+			
+			System.out.println("fora do if do try " + produtosComPreco.count().block().intValue());
+			return Flux.empty();
+			
+		} catch (Exception e) {
+			System.out.println("dentro do catch");
+			return Flux.empty();
+		}
+	}
 
 }

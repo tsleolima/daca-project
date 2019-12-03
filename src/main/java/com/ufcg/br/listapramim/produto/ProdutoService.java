@@ -137,7 +137,7 @@ public class ProdutoService {
 		Flux<Produto> produtos = Flux.empty();
 		for (Compra compra : lista.getCompras()) {
 			Mono<Produto> produto = this.getProduto(user,compra.getIdProduto());
-			produto.filter( p -> p.getMapaDePrecos() != null).mergeWith(produtos);
+			produtos = produto.filter( p -> p.getMapaDePrecos().size() > 0).mergeWith(produtos);
 		}
 		return produtos;
 	}

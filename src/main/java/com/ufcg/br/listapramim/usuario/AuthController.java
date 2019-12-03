@@ -1,6 +1,7 @@
 package com.ufcg.br.listapramim.usuario;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -9,8 +10,12 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.amazonaws.services.sqs.AmazonSQS;
+import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
+import com.amazonaws.services.sqs.model.SendMessageRequest;
 import com.ufcg.br.listapramim.seguranca.JwtTokenProvider;
 
 
@@ -51,4 +56,14 @@ public class AuthController {
         Users useradd = userService.saveUser(user);
         return ResponseEntity.ok(useradd);
     }
+	
+	@Value("${sqs.url}")
+	private String sqsURL;
+	final AmazonSQS sqs = AmazonSQSClientBuilder.defaultClient();
+	
+	@PostMapping("/changePassword")
+	public void requestChangePassword(@RequestParam String email, @RequestParam String newPass){
+		sqs.sendMessage(new SendMessageRequest(sqsURL,email + " " + newPass));
+	
+	}
 }
